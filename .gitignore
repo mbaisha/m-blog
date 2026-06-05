@@ -1,0 +1,38 @@
+# ========== 后端 .NET ==========
+backend/bin/
+backend/obj/
+backend/*.user
+backend/*.suo
+backend/.vs/
+backend/uploads/
+
+# ========== 前台 Next.js ==========
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+frontend/.env.local
+frontend/.env.production
+
+# ========== 后台 Vue ==========
+admin/node_modules/
+admin/dist/
+admin/.env.local
+admin/.env.production
+
+# ========== 根目录 ==========
+node_modules/
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
+Thumbs.db
+
+# ========== IDE ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========== Docker ==========
+docker/postgres/data/
