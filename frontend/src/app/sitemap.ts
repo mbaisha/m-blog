@@ -27,15 +27,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let pageRoutes: MetadataRoute.Sitemap = []
 
   try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api'
+    const API_BASE = process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api'
+
+    // 5 秒超时，避免构建时因后端未启动而长时间挂起
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5000)
+
+    const fetchOptions = { signal: controller.signal }
 
     const [articlesRes, categoriesRes, tagsRes, projectsRes, pagesRes] = await Promise.all([
-      fetch(`${API_BASE}/articles?pageSize=500`).then(r => r.json()).catch(() => ({ data: { items: [] } })),
-      fetch(`${API_BASE}/categories`).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch(`${API_BASE}/tags`).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch(`${API_BASE}/projects`).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch(`${API_BASE}/pages/published`).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_BASE}/articles?pageSize=500`, fetchOptions).then(r => r.json()).catch(() => ({ data: { items: [] } })),
+      fetch(`${API_BASE}/categories`, fetchOptions).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_BASE}/tags`, fetchOptions).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_BASE}/projects`, fetchOptions).then(r => r.json()).catch(() => ({ data: [] })),
+      fetch(`${API_BASE}/pages/published`, fetchOptions).then(r => r.json()).catch(() => ({ data: [] })),
     ])
+
+    clearTimeout(timeout)
 
     const items = articlesRes?.data?.items || []
     articleRoutes = items.map((article: any) => ({
