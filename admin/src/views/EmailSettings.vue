@@ -52,11 +52,11 @@ async function handleSave() {
       smtpServer: form.value.smtpServer,
       smtpPort: form.value.smtpPort,
       smtpUsername: form.value.smtpUsername,
-      smtpPassword: form.value.smtpPassword || undefined as any,
+      smtpPassword: form.value.smtpPassword || undefined,
       senderEmail: form.value.senderEmail,
       senderName: form.value.senderName,
       useSsl: form.value.useSsl
-    })
+    } as any)
     ElMessage.success('邮件设置已保存')
     await loadSetting()
   } finally {

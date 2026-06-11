@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -81,6 +82,65 @@ function Callout({ type, children }: { type: string; children: React.ReactNode }
   )
 }
 
+/** 代码块复制按钮 */
+function CodeBlock({ children, className }: { children: React.ReactNode; className?: string }) {
+  const [copied, setCopied] = useState(false)
+  const preRef = useRef<HTMLPreElement>(null)
+
+  const handleCopy = useCallback(async () => {
+    const codeEl = preRef.current?.querySelector('code')
+    const text = codeEl?.textContent || ''
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch { /* clipboard API 不可用时静默失败 */ }
+  }, [])
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={handleCopy}
+        aria-label={copied ? '已复制' : '复制代码'}
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: 1,
+          padding: '4px 10px',
+          fontSize: '12px',
+          lineHeight: '16px',
+          color: copied ? '#98c379' : '#abb2bf',
+          background: copied ? 'rgba(152, 195, 121, 0.15)' : 'rgba(171, 178, 191, 0.12)',
+          border: `1px solid ${copied ? 'rgba(152, 195, 121, 0.3)' : 'rgba(171, 178, 191, 0.2)'}`,
+          borderRadius: '6px',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+          fontFamily: 'var(--font-mono, monospace)',
+          userSelect: 'none',
+        }}
+        onMouseEnter={(e) => {
+          if (!copied) {
+            e.currentTarget.style.background = 'rgba(171, 178, 191, 0.2)'
+            e.currentTarget.style.borderColor = 'rgba(171, 178, 191, 0.35)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!copied) {
+            e.currentTarget.style.background = 'rgba(171, 178, 191, 0.12)'
+            e.currentTarget.style.borderColor = 'rgba(171, 178, 191, 0.2)'
+          }
+        }}
+      >
+        {copied ? '✓ Copied!' : 'Copy'}
+      </button>
+      <pre ref={preRef} className={className}>
+        {children}
+      </pre>
+    </div>
+  )
+}
+
 export default function MarkdownContent({ content }: Props) {
   const processedContent = preprocessCallouts(content)
 
@@ -106,6 +166,10 @@ export default function MarkdownContent({ content }: Props) {
         ),
         h4: ({ children, id, ...props }) => (
           <h4 id={id} className="scroll-mt-20" {...props}>{children}</h4>
+        ),
+        // 代码块：右上角添加复制按钮
+        pre: ({ children, className, ...props }) => (
+          <CodeBlock className={className}>{children}</CodeBlock>
         ),
       }}
     >

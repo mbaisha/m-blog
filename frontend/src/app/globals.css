@@ -2,8 +2,8 @@
 
 @import "tailwindcss";
 
-/* highlight.js 代码高亮主题 */
-@import 'highlight.js/styles/github.css' layer(base);
+/* highlight.js 代码高亮主题 — Atom One Dark（VS Code 风格） */
+@import 'highlight.js/styles/atom-one-dark.css';
 
 @theme inline {
   --color-background: var(--color-bg);
@@ -173,21 +173,62 @@ body {
 
 .detail-article-body pre {
   margin: 1em 0 1.2em;
-  padding: 1em;
-  background: var(--code-bg);
+  padding: 1.5em 1em 1em;
+  background: #282c34;
   border-radius: 8px;
   overflow-x: auto;
   font-size: 14px;
   line-height: 1.5;
+  /* VS Code 风格：顶部 3 个圆点 */
+  background-image:
+    radial-gradient(circle, #ff5f56 6px, transparent 6px),
+    radial-gradient(circle, #ffbd2e 6px, transparent 6px),
+    radial-gradient(circle, #27c93f 6px, transparent 6px);
+  background-size: 12px 12px, 12px 12px, 12px 12px;
+  background-position: 14px 12px, 34px 12px, 54px 12px;
+  background-repeat: no-repeat;
+  padding-top: 32px;
 }
 
 .detail-article-body pre code {
-  background: none;
+  background: none !important;
   padding: 0;
-  color: #e2e8f0;
   font-size: 14px;
   font-family: var(--font-mono);
 }
+
+.detail-article-body pre code .hljs-keyword { color: #c678dd; }
+.detail-article-body pre code .hljs-string { color: #98c379; }
+.detail-article-body pre code .hljs-number { color: #d19a66; }
+.detail-article-body pre code .hljs-title { color: #61afef; }
+.detail-article-body pre code .hljs-built_in { color: #e5c07b; }
+.detail-article-body pre code .hljs-comment { color: #5c6370; font-style: italic; }
+.detail-article-body pre code .hljs-function { color: #61afef; }
+.detail-article-body pre code .hljs-params { color: #abb2bf; }
+.detail-article-body pre code .hljs-attr { color: #d19a66; }
+.detail-article-body pre code .hljs-attribute { color: #e06c75; }
+.detail-article-body pre code .hljs-selector-class { color: #e5c07b; }
+.detail-article-body pre code .hljs-selector-tag { color: #e06c75; }
+.detail-article-body pre code .hljs-type { color: #e5c07b; }
+.detail-article-body pre code .hljs-literal { color: #56b6c2; }
+.detail-article-body pre code .hljs-tag { color: #e06c75; }
+.detail-article-body pre code .hljs-name { color: #e06c75; }
+.detail-article-body pre code .hljs-section { color: #61afef; }
+.detail-article-body pre code .hljs-addition { color: #98c379; background: rgba(152, 195, 121, 0.12); }
+.detail-article-body pre code .hljs-deletion { color: #e06c75; background: rgba(224, 108, 117, 0.12); }
+.detail-article-body pre code .hljs-meta { color: #c678dd; }
+.detail-article-body pre code .hljs-subst { color: #abb2bf; }
+.detail-article-body pre code .hljs-symbol { color: #61afef; }
+.detail-article-body pre code .hljs-variable { color: #e06c75; }
+.detail-article-body pre code .hljs-template-variable { color: #e06c75; }
+.detail-article-body pre code .hljs-link { color: #61afef; text-decoration: underline; }
+.detail-article-body pre code .hljs-bullet { color: #56b6c2; }
+.detail-article-body pre code .hljs-code { color: #98c379; }
+.detail-article-body pre code .hljs-emphasis { font-style: italic; }
+.detail-article-body pre code .hljs-strong { font-weight: bold; }
+.detail-article-body pre code .hljs-formula { color: #61afef; }
+.detail-article-body pre code .hljs-regexp { color: #98c379; }
+.detail-article-body pre code .hljs-quote { color: #5c6370; font-style: italic; }
 
 .detail-article-body img {
   max-width: 100%;
@@ -256,14 +297,6 @@ body {
 .dark .detail-article-body code {
   background: var(--color-surface);
   color: var(--color-text-primary);
-}
-
-.dark .detail-article-body pre {
-  background: var(--code-bg);
-}
-
-.dark .detail-article-body pre code {
-  color: #e2e8f0;
 }
 
 /* ===== 骨架屏 ===== */

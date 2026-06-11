@@ -109,11 +109,13 @@ const universalModuleDefs: ModuleDef[] = [
 interface ConfigField {
   key: string
   label: string
-  type: 'number' | 'switch' | 'select' | 'textarea' | 'text' | 'radio' | 'multi-select'
+  type: 'number' | 'switch' | 'select' | 'textarea' | 'text' | 'radio' | 'multi-select' | 'color'
   default: any
   options?: { label: string; value: any }[]
   placeholder?: string
   tip?: string
+  min?: number
+  max?: number
 }
 
 interface ModuleDef {

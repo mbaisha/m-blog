@@ -3,8 +3,8 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: '/admin/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/admin/' : '/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -24,4 +24,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))

@@ -276,7 +276,7 @@ defineExpose({
 })
 
 /** 工具栏配置：数字 0-6 是 defToolbars 中 7 个自定义按钮的索引 */
-const toolbars = [
+const toolbars = ([
   'bold', 'italic', 'underline', 'strikeThrough', 'sub', 'sup',
   '-',
   'title', 'quote', 'unorderedList', 'orderedList', 'task',
@@ -292,7 +292,7 @@ const toolbars = [
   'previewOnly', 'htmlPreview', 'catalog',
   '-',
   'katex', 'mermaid'
-]
+] as any)
 </script>
 
 <template>

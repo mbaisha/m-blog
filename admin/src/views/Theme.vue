@@ -118,8 +118,9 @@ async function handleCreate() {
     })
     if (!value) return
     const res = await createThemeApi(value)
-    themeList.value.push(res.data.data as unknown as ThemeSetting)
-    selectTheme(res.data.data.id)
+    const created = res.data.data!
+    themeList.value.push(created as unknown as ThemeSetting)
+    selectTheme(created.id)
     ElMessage.success('主题已创建')
   } catch { /* cancelled */ }
 }
@@ -134,8 +135,9 @@ async function handleDuplicate() {
     })
     if (!value) return
     const res = await duplicateThemeApi(selectedId.value, value)
-    themeList.value.push(res.data.data as unknown as ThemeSetting)
-    selectTheme(res.data.data.id)
+    const dup = res.data.data!
+    themeList.value.push(dup as unknown as ThemeSetting)
+    selectTheme(dup.id)
     ElMessage.success('主题已复制')
   } catch { /* cancelled */ }
 }
@@ -186,6 +188,7 @@ async function handleReset() {
     await activateThemeApi(selectedId.value)
     const res = await resetThemeApi()
     const d = res.data.data
+    if (!d) return
     form.value = {
       themeName: d.themeName,
       primaryColor: d.primaryColor,
