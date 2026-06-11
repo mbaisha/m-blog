@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#fff" rx="8"/>
+  <rect x="50" y="50" width="500" height="300" fill="#fff5f5" rx="6" stroke="#e53e3e" stroke-width="2"/>
+  <circle cx="300" cy="120" r="40" fill="#fee2e2" stroke="#e53e3e" stroke-width="2"/>
+  <path d="M300 95 L300 145" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M300 160 L300 170" stroke="#e53e3e" stroke-width="4" stroke-linecap="round"/>
+  <text x="300" y="210" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="bold" fill="#e53e3e">
+    未经授权禁止引用
+  </text>
+  <text x="300" y="245" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#666">
+    此资源来自 imbs.top
+  </text>
+  <text x="300" y="278" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#999">
+    如需使用请联系博主获取授权
+  </text>
+</svg>

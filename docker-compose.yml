@@ -94,6 +94,7 @@ services:
     volumes:
       - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - uploads_data:/var/www/uploads:ro  # 让 Nginx 可以代理上传文件
+      - ./deploy/hotlink-warning.svg:/var/www/hotlink-warning.svg:ro  # 防盗链警告图片
     depends_on:
       - api
       - frontend

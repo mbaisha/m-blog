@@ -3,6 +3,20 @@ import type { NextConfig } from "next";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5092/api";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/index.php/archives/:id',
+        destination: '/articles/show-:id',
+        permanent: true,
+      },
+      {
+        source: '/index.php/archives/:id/',
+        destination: '/articles/show-:id',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const backendUrl = API_BASE.replace(/\/api$/, "");
     return [

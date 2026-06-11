@@ -23,6 +23,6 @@ COPY --from=build /app/publish .
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:5000/api/health || exit 1
+    CMD curl -f http://localhost:5000/api/health/ready || exit 1
 
 ENTRYPOINT ["dotnet", "Mblog.API.dll"]
