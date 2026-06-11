@@ -9,14 +9,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.17.0",
+    "cropperjs": "^1.6.2",
+    "echarts": "^6.1.0",
     "element-plus": "^2.14.1",
+    "md-editor-v3": "^6.5.1",
     "pinia": "^3.0.4",
+    "pinyin-pro": "^3.28.1",
+    "sortablejs": "^1.15.7",
     "vue": "^3.5.34",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@types/cropperjs": "^1.1.5",
     "@types/node": "^24.12.3",
+    "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
     "typescript": "~6.0.2",

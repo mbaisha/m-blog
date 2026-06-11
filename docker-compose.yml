@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # ===== 数据库 =====
   postgres:
     image: postgres:16-alpine
     container_name: mblog-postgres
@@ -10,15 +11,95 @@ services:
     environment:
       POSTGRES_DB: mblog
       POSTGRES_USER: mblog_user
-      POSTGRES_PASSWORD: mblog_pass
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mblog_pass}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./deploy/backup:/backup  # 备份目录映射
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mblog_user -d mblog"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ===== 后端 API =====
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mblog-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_URLS: "http://+:5000"
+      ASPNETCORE_ENVIRONMENT: Production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mblog
+      DB_USER: mblog_user
+      DB_PASSWORD: ${DB_PASSWORD:-mblog_pass}
+      JWT_KEY: ${JWT_KEY:-your-super-secret-key-at-least-32-characters}
+    volumes:
+      - uploads_data:/app/uploads  # 持久化上传文件
+      - logs_data:/app/logs        # 持久化日志
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ===== 前台（Next.js） =====
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
+        NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
+        NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
+    container_name: mblog-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
+      NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
+      NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
+    depends_on:
+      - api
+
+  # ===== 后台管理 =====
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
+        VITE_SITE_NAME: ${SITE_NAME:-个人博客}后台管理
+    container_name: mblog-admin
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
+      VITE_SITE_NAME: ${SITE_NAME:-个人博客}后台管理
+
+  # ===== Nginx 反向代理 =====
+  nginx:
+    image: nginx:stable-alpine
+    container_name: mblog-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - uploads_data:/var/www/uploads:ro  # 让 Nginx 可以代理上传文件
+    depends_on:
+      - api
+      - frontend
+      - admin
+
 volumes:
   postgres_data:
+  uploads_data:
+  logs_data:
