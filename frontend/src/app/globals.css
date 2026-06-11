@@ -195,6 +195,7 @@ body {
   padding: 0;
   font-size: 14px;
   font-family: var(--font-mono);
+  color: #abb2bf; /* 默认代码文字色，不依赖 atom-one-dark.css 的 @import */
 }
 
 .detail-article-body pre code .hljs-keyword { color: #c678dd; }

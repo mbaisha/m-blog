@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let pageRoutes: MetadataRoute.Sitemap = []
 
   try {
-    const API_BASE = process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api'
+    const API_BASE = process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'
 
     // 5 秒超时，避免构建时因后端未启动而长时间挂起
     const controller = new AbortController()
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const items = articlesRes?.data?.items || []
     articleRoutes = items.map((article: any) => ({
       url: `${BASE_URL}/articles/${article.slug}`,
-      lastModified: new Date(article.updatedAt || article.publishedAt),
+      lastModified: new Date(article.updatedAt || article.publishedAt || new Date()),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))
@@ -72,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const projects = projectsRes?.data?.items || projectsRes?.data || []
     projectRoutes = (Array.isArray(projects) ? projects : []).map((proj: any) => ({
       url: `${BASE_URL}/projects/${proj.slug}`,
-      lastModified: new Date(proj.updatedAt || proj.createdAt),
+      lastModified: new Date(proj.updatedAt || proj.createdAt || new Date()),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     }))
@@ -80,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const pages = pagesRes?.data || []
     pageRoutes = (Array.isArray(pages) ? pages : []).map((page: any) => ({
       url: `${BASE_URL}/${page.slug}`,
-      lastModified: new Date(page.updatedAt || page.createdAt),
+      lastModified: new Date(page.updatedAt || page.createdAt || new Date()),
       changeFrequency: 'monthly' as const,
       priority: 0.5,
     }))

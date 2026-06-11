@@ -477,8 +477,9 @@ Docker Compose 大大简化了多服务应用的本地开发和部署流程。
             new NavigationItem { Title = "归档", Url = "/archive", SortOrder = 5, IsVisible = true },
             new NavigationItem { Title = "项目", Url = "/projects", SortOrder = 6, IsVisible = true },
             new NavigationItem { Title = "关于", Url = "/about", SortOrder = 7, IsVisible = true },
-            new NavigationItem { Title = "友情链接", Url = "/friends", SortOrder = 8, IsVisible = true },
-            new NavigationItem { Title = "搜索", Url = "/search", SortOrder = 9, IsVisible = true }
+            new NavigationItem { Title = "留言板", Url = "/guestbook", SortOrder = 8, IsVisible = true },
+            new NavigationItem { Title = "友情链接", Url = "/friends", SortOrder = 9, IsVisible = true },
+            new NavigationItem { Title = "搜索", Url = "/search", SortOrder = 10, IsVisible = true }
         );
 
         // ===== 10. 页脚配置 =====

@@ -1,10 +1,12 @@
 import type { ApiResponse, CaptchaImageResponse, CommentItem, CreateCommentRequest, CreateCommentResult, PagedData, PublicProfileSection, PublicProjectListItem, PublicProjectDetail, PublicFriendItem, PublicSiteSettingResponse, PublicSeoSettingResponse } from "@/types";
 
-// 服务端渲染时使用 Docker 内部网络直连后端
-// 客户端渲染时通过 Nginx 代理路径 /api
+// API 地址策略：
+//   Docker SSR → INTERNAL_API_BASE_URL=http://api:5000/api (直连后端)
+//   本地 SSR  → NEXT_PUBLIC_API_BASE_URL (需在 .env.local 中设置)
+//   浏览器端  → NEXT_PUBLIC_API_BASE_URL (Nginx 代理或直连)
 const isServer = typeof window === 'undefined'
 const API_BASE_URL = isServer
-  ? (process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://api:5000/api')
+  ? (process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api')
   : (process.env.NEXT_PUBLIC_API_BASE_URL || '/api')
 
 /**
