@@ -79,7 +79,7 @@ request.interceptors.response.use(
           localStorage.removeItem('refreshToken')
           const authStore = useAuthStore()
           authStore.clearUser()
-          window.location.href = '/login'
+          window.location.href = import.meta.env.BASE_URL + 'login'
           return Promise.reject(error)
         }
       } else {
