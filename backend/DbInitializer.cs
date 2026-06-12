@@ -636,23 +636,96 @@ Docker Compose 大大简化了多服务应用的本地开发和部署流程。
             }
         );
 
-        // ===== 12. 首页布局 =====
+        // ===== 12. 首页布局（与 LayoutService.GetDefaultModules 保持一致） =====
         db.ModuleLayouts.AddRange(
-            new ModuleLayout { PageKey = "home", ModuleKey = "hero", Title = "Hero 区域", SortOrder = 1, IsEnabled = true, Config = "{}" },
-            new ModuleLayout { PageKey = "home", ModuleKey = "featured-articles", Title = "推荐文章", SortOrder = 2, IsEnabled = true, Config = "{\"count\":6}" },
-            new ModuleLayout { PageKey = "home", ModuleKey = "recent-projects", Title = "最近项目", SortOrder = 3, IsEnabled = true, Config = "{\"count\":3}" },
-            new ModuleLayout { PageKey = "home", ModuleKey = "categories", Title = "分类展示", SortOrder = 4, IsEnabled = true, Config = "{}" },
-            new ModuleLayout { PageKey = "home", ModuleKey = "friends", Title = "友情链接", SortOrder = 5, IsEnabled = true, Config = "{\"count\":8}" }
+            new ModuleLayout { PageKey = "home", ModuleKey = "hero", Title = "首屏横幅", SortOrder = 0, IsEnabled = true, Config = "{\"subtitle\":\"INDEPENDENT CREATOR\",\"title\":\"\",\"description\":\"\",\"subDescription\":\"\",\"buttons\":[{\"text\":\"开始阅读\",\"link\":\"/articles\",\"style\":\"solid\"},{\"text\":\"联系我\",\"link\":\"/about\",\"style\":\"outline\"}],\"backgroundMode\":\"none\",\"gradientColors\":\"primary-to-accent\",\"carouselImages\":[{\"url\":\"https://picsum.photos/1200/600?random=1\"},{\"url\":\"https://picsum.photos/1200/600?random=2\"}],\"carouselInterval\":5000}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "hot_tags", Title = "热门标签", SortOrder = 1, IsEnabled = true, Config = "{\"count\":10,\"displayStyle\":\"inline\"}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "pinned_posts", Title = "置顶文章", SortOrder = 2, IsEnabled = true, Config = "{\"displayStyle\":\"card\",\"count\":5,\"columns\":3}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "featured_posts", Title = "精选文章", SortOrder = 3, IsEnabled = true, Config = "{\"count\":3,\"displayStyle\":\"card\",\"columns\":3}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "recent_posts", Title = "最新文章", SortOrder = 4, IsEnabled = true, Config = "{\"count\":5,\"displayStyle\":\"list\"}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "projects", Title = "项目展示", SortOrder = 5, IsEnabled = true, Config = "{\"count\":4}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "subscription", Title = "邮件订阅", SortOrder = 6, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "image_carousel", Title = "图片轮播", SortOrder = 7, IsEnabled = false, Config = "{\"images\":[{\"url\":\"https://picsum.photos/800/400?random=1\",\"link\":\"/articles\",\"title\":\"欢迎来到我的博客\"},{\"url\":\"https://picsum.photos/800/400?random=2\",\"link\":\"/projects\",\"title\":\"查看我的项目\"}],\"autoPlay\":true,\"interval\":4000,\"height\":400}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "statistics", Title = "统计面板", SortOrder = 8, IsEnabled = false, Config = "{\"showArticles\":true,\"showProjects\":true,\"showViews\":true,\"showTags\":true}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "video_player", Title = "视频播放", SortOrder = 9, IsEnabled = false, Config = "{\"url\":\"https://www.youtube.com/embed/dQw4w9WgXcQ\",\"aspectRatio\":\"16/9\",\"autoplay\":false}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "call_to_action", Title = "号召按钮", SortOrder = 10, IsEnabled = false, Config = "{\"text\":\"联系我\",\"link\":\"/about\",\"description\":\"有任何问题或合作意向，欢迎联系\",\"style\":\"primary\"}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "divider", Title = "分割线", SortOrder = 11, IsEnabled = false, Config = "{\"style\":\"solid\",\"margin\":32}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "spacer", Title = "间距占位", SortOrder = 12, IsEnabled = false, Config = "{\"height\":40}" },
+            new ModuleLayout { PageKey = "home", ModuleKey = "custom", Title = "自定义区域", SortOrder = 13, IsEnabled = false, Config = "{\"html\":\"<div style=\\\"text-align:center;padding:20px\\\"><h3>自定义区域</h3><p>你可以在这里添加任何 HTML 内容</p></div>\"}" }
         );
 
-        // ===== 13. SEO 设置 =====
+        // ===== 13. 文章列表页布局 =====
+        db.ModuleLayouts.AddRange(
+            new ModuleLayout { PageKey = "articles", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "pinned_posts", Title = "置顶文章", SortOrder = 1, IsEnabled = true, Config = "{\"displayStyle\":\"card\",\"count\":5,\"columns\":3}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "image_carousel", Title = "顶部轮播", SortOrder = 2, IsEnabled = false, Config = "{\"images\":[{\"url\":\"https://picsum.photos/800/400?random=3\",\"title\":\"示例\"}],\"autoPlay\":true,\"interval\":4000}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "search_bar", Title = "搜索筛选条", SortOrder = 3, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "article_list", Title = "文章列表", SortOrder = 4, IsEnabled = true, Config = "{\"viewMode\":\"card\",\"columns\":3,\"pageSize\":12}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "sidebar", Title = "右侧边栏", SortOrder = 5, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "custom", Title = "自定义区域", SortOrder = 6, IsEnabled = false, Config = "{\"html\":\"<p>自定义内容</p>\"}" },
+            new ModuleLayout { PageKey = "articles", ModuleKey = "divider", Title = "分割线", SortOrder = 7, IsEnabled = false, Config = "{\"style\":\"solid\",\"margin\":24}" }
+        );
+
+        // ===== 14. 其他页面布局（文章详情、归档、搜索、项目、分类、标签、关于、友链、留言板） =====
+        db.ModuleLayouts.AddRange(
+            // 文章详情
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "progress_bar", Title = "阅读进度条", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "article_hero", Title = "文章标题区", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "content", Title = "正文区", SortOrder = 2, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "sidebar", Title = "右侧分享栏", SortOrder = 3, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "toc", Title = "浮动目录", SortOrder = 4, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "tags", Title = "标签区", SortOrder = 5, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "prev_next", Title = "上下篇文章", SortOrder = 6, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "related", Title = "相关文章", SortOrder = 7, IsEnabled = true, Config = "{\"count\":3}" },
+            new ModuleLayout { PageKey = "article_detail", ModuleKey = "comments", Title = "评论区", SortOrder = 8, IsEnabled = true, Config = "{}" },
+            // 归档
+            new ModuleLayout { PageKey = "archive", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "archive", ModuleKey = "timeline", Title = "时间线列表", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 搜索
+            new ModuleLayout { PageKey = "search", ModuleKey = "search_bar", Title = "搜索条", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "search", ModuleKey = "result_stats", Title = "搜索结果统计", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "search", ModuleKey = "search_results", Title = "搜索结果", SortOrder = 2, IsEnabled = true, Config = "{}" },
+            // 项目列表
+            new ModuleLayout { PageKey = "projects", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "projects", ModuleKey = "project_grid", Title = "项目卡片网格", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 项目详情
+            new ModuleLayout { PageKey = "project_detail", ModuleKey = "project_hero", Title = "项目 Hero", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "project_detail", ModuleKey = "cover", Title = "封面图", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "project_detail", ModuleKey = "project_content", Title = "项目介绍", SortOrder = 2, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "project_detail", ModuleKey = "tech_stack", Title = "技术栈", SortOrder = 3, IsEnabled = true, Config = "{}" },
+            // 分类列表
+            new ModuleLayout { PageKey = "categories", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "categories", ModuleKey = "category_grid", Title = "分类卡片", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 分类文章
+            new ModuleLayout { PageKey = "category_detail", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "category_detail", ModuleKey = "pinned_posts", Title = "置顶文章", SortOrder = 1, IsEnabled = true, Config = "{\"displayStyle\":\"card\",\"count\":5,\"columns\":3}" },
+            new ModuleLayout { PageKey = "category_detail", ModuleKey = "article_list", Title = "文章列表", SortOrder = 2, IsEnabled = true, Config = "{\"columns\":3}" },
+            // 标签云
+            new ModuleLayout { PageKey = "tags", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "tags", ModuleKey = "tag_cloud", Title = "标签云", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 标签文章
+            new ModuleLayout { PageKey = "tag_detail", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "tag_detail", ModuleKey = "article_list", Title = "文章列表", SortOrder = 1, IsEnabled = true, Config = "{\"columns\":3}" },
+            // 关于
+            new ModuleLayout { PageKey = "about", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "about", ModuleKey = "profile_sections", Title = "个人模块", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 友链
+            new ModuleLayout { PageKey = "friends", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "friends", ModuleKey = "friend_grid", Title = "友链卡片", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            // 留言板
+            new ModuleLayout { PageKey = "guestbook", ModuleKey = "page_hero", Title = "", SortOrder = 0, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "guestbook", ModuleKey = "message_form", Title = "留言表单", SortOrder = 1, IsEnabled = true, Config = "{}" },
+            new ModuleLayout { PageKey = "guestbook", ModuleKey = "message_list", Title = "留言列表", SortOrder = 2, IsEnabled = true, Config = "{}" }
+        );
+
+        // ===== 15. SEO 设置 =====
         db.SeoSettings.AddRange(
             new SeoSetting { PageKey = "home", Title = "个人博客 - 分享技术实践与产品思考", Description = "一个现代个人博客，分享技术实践、产品思考与项目复盘" },
             new SeoSetting { PageKey = "articles", Title = "文章列表 - 个人博客", Description = "浏览所有技术文章" },
             new SeoSetting { PageKey = "projects", Title = "项目展示 - 个人博客", Description = "浏览所有项目作品" }
         );
 
-        // ===== 14. 个人页面模块 =====
+        // ===== 16. 个人页面模块 =====
         db.ProfileSections.AddRange(
             new ProfileSection
             {
