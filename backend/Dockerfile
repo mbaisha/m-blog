@@ -15,6 +15,11 @@ WORKDIR /app
 EXPOSE 5000
 EXPOSE 5001
 
+# 安装字体（验证码生成需要）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 # 创建上传目录和日志目录
 RUN mkdir -p /app/uploads /app/logs
 

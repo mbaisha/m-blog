@@ -222,6 +222,18 @@ public class CaptchaService : ICaptchaService
         return new CaptchaVerifyResult { Valid = true };
     }
 
+    private static SKTypeface GetCaptchaFont()
+    {
+        // 尝试多种字体（按优先级），Linux Docker 中 Arial 不可用
+        foreach (var family in new[] { "DejaVu Sans", "Arial", "Tahoma", "Verdana", "sans-serif" })
+        {
+            var typeface = SKTypeface.FromFamilyName(family, SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
+            if (typeface?.FamilyName != null && !typeface.FamilyName.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+                return typeface;
+        }
+        return SKTypeface.Default;
+    }
+
     /// <summary>使用 SkiaSharp 绘制验证码图片</summary>
     private static string DrawCaptchaImage(string code)
     {
@@ -256,8 +268,8 @@ public class CaptchaService : ICaptchaService
             canvas.DrawPoint(random.Next(0, ImageWidth), random.Next(0, ImageHeight), noisePaint);
         }
 
-        // 绘制验证码字符
-        using var font = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright), 24);
+        // 绘制验证码字符（使用回退字体）
+        using var font = new SKFont(GetCaptchaFont(), 24);
         var textWidth = code.Length * 20;
         var startX = (ImageWidth - textWidth) / 2;
         var y = ImageHeight / 2 + 8;
