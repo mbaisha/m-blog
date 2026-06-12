@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -65,6 +66,13 @@ namespace Mblog.API.Data.Migrations
                     b.Property<DateTimeOffset?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "simple")
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Title", "Summary", "Content" });
+
                     b.Property<string>("SeoDescription")
                         .HasColumnType("text");
 
@@ -110,6 +118,10 @@ namespace Mblog.API.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CoverImageId");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.HasIndex("Slug")
                         .IsUnique();
@@ -1359,8 +1371,26 @@ namespace Mblog.API.Data.Migrations
                     b.Property<Guid?>("FaviconImageId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("IpBanDurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IpBanEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IpBanThreshold")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IpBanWindowSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("LoginCaptchaEnabled")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid?>("LogoImageId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("ReplyNotificationEnabled")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("SiteDescription")
                         .HasMaxLength(512)
@@ -1372,9 +1402,6 @@ namespace Mblog.API.Data.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasDefaultValue("My Blog");
-
-                    b.Property<bool>("SubscriptionEnabled")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()

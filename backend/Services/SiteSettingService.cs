@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Mblog.API.Data;
+using Mblog.API.Middleware;
 using Mblog.API.Models.DTOs;
 using Mblog.API.Models.Entities;
 
@@ -50,7 +51,7 @@ public class SiteSettingService : ISiteSettingService
             SiteDescription = setting.SiteDescription,
             LogoImageUrl = setting.LogoImage?.Url,
             FaviconImageUrl = setting.FaviconImage?.Url,
-            SubscriptionEnabled = setting.SubscriptionEnabled
+            LoginCaptchaEnabled = setting.LoginCaptchaEnabled
         };
     }
 
@@ -66,7 +67,12 @@ public class SiteSettingService : ISiteSettingService
                 LogoImageId = request.LogoImageId,
                 FaviconImageId = request.FaviconImageId,
                 CommentModerationEnabled = request.CommentModerationEnabled ?? true,
-                SubscriptionEnabled = request.SubscriptionEnabled ?? false,
+                ReplyNotificationEnabled = request.ReplyNotificationEnabled ?? false,
+                LoginCaptchaEnabled = request.LoginCaptchaEnabled ?? true,
+                IpBanEnabled = request.IpBanEnabled ?? true,
+                IpBanThreshold = request.IpBanThreshold ?? 200,
+                IpBanWindowSeconds = request.IpBanWindowSeconds ?? 10,
+                IpBanDurationMinutes = request.IpBanDurationMinutes ?? 5,
                 VisitRetentionDays = request.VisitRetentionDays ?? 30
             };
             _db.SiteSettings.Add(setting);
@@ -78,9 +84,17 @@ public class SiteSettingService : ISiteSettingService
             if (request.LogoImageId != null) setting.LogoImageId = request.LogoImageId;
             if (request.FaviconImageId != null) setting.FaviconImageId = request.FaviconImageId;
             if (request.CommentModerationEnabled != null) setting.CommentModerationEnabled = request.CommentModerationEnabled.Value;
-            if (request.SubscriptionEnabled != null) setting.SubscriptionEnabled = request.SubscriptionEnabled.Value;
+            if (request.ReplyNotificationEnabled != null) setting.ReplyNotificationEnabled = request.ReplyNotificationEnabled.Value;
+            if (request.LoginCaptchaEnabled != null) setting.LoginCaptchaEnabled = request.LoginCaptchaEnabled.Value;
+            if (request.IpBanEnabled != null) setting.IpBanEnabled = request.IpBanEnabled.Value;
+            if (request.IpBanThreshold != null) setting.IpBanThreshold = request.IpBanThreshold.Value;
+            if (request.IpBanWindowSeconds != null) setting.IpBanWindowSeconds = request.IpBanWindowSeconds.Value;
+            if (request.IpBanDurationMinutes != null) setting.IpBanDurationMinutes = request.IpBanDurationMinutes.Value;
             if (request.VisitRetentionDays != null) setting.VisitRetentionDays = request.VisitRetentionDays.Value;
         }
+
+        // 更新 IP 黑名单中间件配置
+        IpBanMiddleware.UpdateOptions(setting.IpBanThreshold, setting.IpBanWindowSeconds, setting.IpBanDurationMinutes, setting.IpBanEnabled);
 
         await _db.SaveChangesAsync();
 
@@ -103,7 +117,12 @@ public class SiteSettingService : ISiteSettingService
             FaviconImageId = setting.FaviconImageId,
             FaviconImageUrl = setting.FaviconImage?.Url,
             CommentModerationEnabled = setting.CommentModerationEnabled,
-            SubscriptionEnabled = setting.SubscriptionEnabled,
+            ReplyNotificationEnabled = setting.ReplyNotificationEnabled,
+            LoginCaptchaEnabled = setting.LoginCaptchaEnabled,
+            IpBanEnabled = setting.IpBanEnabled,
+            IpBanThreshold = setting.IpBanThreshold,
+            IpBanWindowSeconds = setting.IpBanWindowSeconds,
+            IpBanDurationMinutes = setting.IpBanDurationMinutes,
             VisitRetentionDays = setting.VisitRetentionDays
         };
     }

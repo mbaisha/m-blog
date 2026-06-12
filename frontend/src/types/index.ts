@@ -192,6 +192,7 @@ export interface PublicSiteSettingResponse {
   siteDescription: string | null
   logoImageUrl: string | null
   faviconImageUrl: string | null
+  loginCaptchaEnabled: boolean
 }
 
 export interface PublicSeoSettingResponse {

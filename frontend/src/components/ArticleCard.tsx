@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import type { PublicArticleListItem } from '@/types'
 
 // ===== Brand colors =====
@@ -69,7 +70,7 @@ export default function ArticleCard({
           }}
         >
           {article.coverImageUrl ? (
-            <img src={article.coverImageUrl} alt={article.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+            <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-[24px] font-bold">
               <span>{getFirstValidChar(article.title)}</span>
@@ -168,7 +169,7 @@ export default function ArticleCard({
         }}
       >
         {article.coverImageUrl ? (
-          <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover" loading="lazy" />
+          <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" />
         ) : (
           <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>
         )}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { apiClient, fetchSeoSettings, fetchPageLayout } from "@/lib/api"
 import type { ApiResponse, PublicFriendItem, PublicModuleLayout } from "@/types"
 import VisitTracker from "@/components/VisitTracker"
@@ -92,7 +93,7 @@ export default async function FriendsPage() {
                 style={{ background: 'linear-gradient(135deg, var(--color-primary-light), transparent)' }}
               >
                 {friend.logoImageUrl ? (
-                  <img src={friend.logoImageUrl} alt={friend.name} className="w-full h-full object-cover" />
+                  <Image src={friend.logoImageUrl} alt={friend.name} fill className="object-cover" sizes="64px" />
                 ) : (
                   <span className="text-lg font-bold" style={{ color: 'var(--color-primary)', opacity: 0.4 }}>
                     {getFirstValidChar(friend.name)}

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Mblog.API.Common;
 using Mblog.API.Data;
+using Mblog.API.Middleware;
 using Mblog.API.Services;
 using Serilog;
 using Mblog.API;
@@ -128,6 +129,7 @@ try
     builder.Services.AddScoped<IArticleService, ArticleService>();
     builder.Services.AddScoped<IMediaService, MediaService>();
     builder.Services.AddScoped<ICaptchaService, CaptchaService>();
+    builder.Services.AddSingleton<ILoginAttemptService, LoginAttemptService>();
     builder.Services.AddHttpClient<ICommentService, CommentService>(client =>
     {
         client.Timeout = TimeSpan.FromSeconds(5);
@@ -155,6 +157,7 @@ try
 builder.Services.AddScoped<ILlmService, LlmService>();
 builder.Services.AddScoped<IImageGenService, ImageGenService>();
 builder.Services.AddScoped<IArticleAiService, ArticleAiService>();
+    builder.Services.AddScoped<ImportService>();
     builder.Services.AddHostedService<VisitCleanupJob>();
     builder.Services.AddHostedService<WeeklyDigestJob>();
     builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection(StorageSettings.SectionName));
@@ -207,9 +210,27 @@ builder.Services.AddScoped<IArticleAiService, ArticleAiService>();
 
     var app = builder.Build();
 
+    // 初始化 IP 黑名单配置
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var siteSetting = await db.SiteSettings.FirstOrDefaultAsync();
+        if (siteSetting != null)
+        {
+            IpBanMiddleware.UpdateOptions(
+                siteSetting.IpBanThreshold,
+                siteSetting.IpBanWindowSeconds,
+                siteSetting.IpBanDurationMinutes,
+                siteSetting.IpBanEnabled);
+        }
+    }
+    catch { /* 首次部署时数据库可能还没准备好，忽略 */ }
+
     // ========== 中间件管道 ==========
     // 全局异常处理（须在最外层）
     app.UseMiddleware<ExceptionMiddleware>();
+    app.UseMiddleware<IpBanMiddleware>();
 
     // Swagger（仅开发环境）
     if (app.Environment.IsDevelopment())

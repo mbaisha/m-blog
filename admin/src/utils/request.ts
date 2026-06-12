@@ -57,8 +57,11 @@ request.interceptors.response.use(
 
     const status = response.status
 
-    // 401 未授权：尝试刷新 Token
-    if (status === 401) {
+    // 判断是否为认证相关接口（登录/刷新），这些接口的 401 直接返回给调用方
+    const isAuthRequest = config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh')
+
+    // 401 未授权：尝试刷新 Token（认证接口除外）
+    if (status === 401 && !isAuthRequest) {
       if (!isRefreshing) {
         isRefreshing = true
         try {
@@ -99,6 +102,13 @@ request.interceptors.response.use(
     // 403 无权限
     if (status === 403) {
       ElMessage.error('无权限访问')
+      return Promise.reject(error)
+    }
+
+    // 429 访问太频繁
+    if (status === 429) {
+      const msg = response.data?.message || '访问太频繁，已被拒绝访问'
+      ElMessage.warning(msg)
       return Promise.reject(error)
     }
 

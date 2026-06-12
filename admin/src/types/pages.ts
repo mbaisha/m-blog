@@ -180,7 +180,12 @@ export interface SiteSetting {
   faviconImageId: string | null
   faviconImageUrl: string | null
   commentModerationEnabled: boolean
-  subscriptionEnabled: boolean
+  replyNotificationEnabled: boolean
+  loginCaptchaEnabled: boolean
+  ipBanEnabled: boolean
+  ipBanThreshold: number
+  ipBanWindowSeconds: number
+  ipBanDurationMinutes: number
   visitRetentionDays: number
 }
 
@@ -190,7 +195,12 @@ export interface SaveSiteSettingRequest {
   logoImageId?: string | null
   faviconImageId?: string | null
   commentModerationEnabled?: boolean
-  subscriptionEnabled?: boolean
+  replyNotificationEnabled?: boolean
+  loginCaptchaEnabled?: boolean
+  ipBanEnabled?: boolean
+  ipBanThreshold?: number
+  ipBanWindowSeconds?: number
+  ipBanDurationMinutes?: number
   visitRetentionDays?: number
 }
 

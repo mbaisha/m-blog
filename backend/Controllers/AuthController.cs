@@ -15,14 +15,21 @@ namespace Mblog.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ILoginAttemptService? _loginAttemptService;
+    private readonly ISiteSettingService? _siteSettingService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(
+        IAuthService authService,
+        ILoginAttemptService? loginAttemptService = null,
+        ISiteSettingService? siteSettingService = null)
     {
         _authService = authService;
+        _loginAttemptService = loginAttemptService;
+        _siteSettingService = siteSettingService;
     }
 
     /// <summary>
-    /// 用户登录
+    /// 用户登录（支持验证码）
     /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
@@ -33,8 +40,39 @@ public class AuthController : ControllerBase
             return BadRequest(ApiResponse.Fail("用户名和密码不能为空"));
         }
 
-        var result = await _authService.LoginAsync(request);
-        return Ok(ApiResponse.Ok(result, "登录成功"));
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        // 检查是否被锁定
+        if (_loginAttemptService?.IsLocked(ip) == true)
+        {
+            return StatusCode(429, ApiResponse.Fail("登录尝试次数过多，请 15 分钟后再试"));
+        }
+
+        // 如果之前有失败记录且开启了验证码功能，要求验证码
+        var captchaEnabled = true;
+        if (_siteSettingService != null)
+        {
+            var siteSetting = await _siteSettingService.GetAsync();
+            if (siteSetting != null)
+                captchaEnabled = siteSetting.LoginCaptchaEnabled;
+        }
+        var needCaptcha = captchaEnabled && _loginAttemptService?.GetFailedCount(ip) >= 1;
+        if (needCaptcha && string.IsNullOrWhiteSpace(request.CaptchaSessionId))
+        {
+            return Unauthorized(ApiResponse.Fail("请输入验证码"));
+        }
+
+        try
+        {
+            var result = await _authService.LoginAsync(request, request.CaptchaSessionId, request.CaptchaAnswer, ip);
+            _loginAttemptService?.RecordSuccess(ip);
+            return Ok(ApiResponse.Ok(result, "登录成功"));
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _loginAttemptService?.RecordFailure(ip);
+            return Unauthorized(ApiResponse.Fail(ex.Message));
+        }
     }
 
     /// <summary>

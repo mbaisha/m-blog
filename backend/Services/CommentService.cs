@@ -52,6 +52,7 @@ public class CommentService : ICommentService
 {
     private readonly AppDbContext _db;
     private readonly ICaptchaService _captchaService;
+    private readonly IEmailService _emailService;
     private readonly ILogger<CommentService> _logger;
     private readonly HttpClient _httpClient;
 
@@ -68,10 +69,11 @@ public class CommentService : ICommentService
     // 敏感词列表（示例，生产环境可从配置文件或数据库加载）
     private static readonly string[] _sensitiveWords = { "赌博", "色情", "代开发票", "办证", "枪支", "毒品" };
 
-    public CommentService(AppDbContext db, ICaptchaService captchaService, ILogger<CommentService> logger, HttpClient httpClient)
+    public CommentService(AppDbContext db, ICaptchaService captchaService, IEmailService emailService, ILogger<CommentService> logger, HttpClient httpClient)
     {
         _db = db;
         _captchaService = captchaService;
+        _emailService = emailService;
         _logger = logger;
         _httpClient = httpClient;
     }
@@ -213,6 +215,9 @@ public class CommentService : ICommentService
                 article.CommentCount++;
                 await _db.SaveChangesAsync();
             }
+
+            // 发送回复通知邮件（异步，不阻塞响应）
+            _ = SendReplyNotificationAsync(comment, article);
         }
 
         _logger.LogInformation("评论已提交: ArticleId={ArticleId}, Status={Status}, IpHash={IpHash}", request.ArticleId, status, ipHash);
@@ -300,6 +305,13 @@ public class CommentService : ICommentService
 
         await _db.SaveChangesAsync();
         _logger.LogInformation("评论审核通过: CommentId={CommentId}, ReviewerId={ReviewerId}", id, reviewerId);
+
+        // 发送回复通知邮件
+        if (article != null)
+        {
+            _ = SendReplyNotificationAsync(comment, article);
+        }
+
         return true;
     }
 
@@ -602,6 +614,86 @@ public class CommentService : ICommentService
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(ip));
         return Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    /// <summary>发送回复通知邮件（fire-and-forget）</summary>
+    private async Task SendReplyNotificationAsync(Comment comment, Article article)
+    {
+        try
+        {
+            // 检查后台是否开启了回复邮件通知
+            var siteSetting = await _db.SiteSettings.AsNoTracking().FirstOrDefaultAsync();
+            if (siteSetting?.ReplyNotificationEnabled != true)
+                return;
+
+            // 只对回复（有父评论）的评论发送通知
+            if (!comment.ParentId.HasValue)
+                return;
+
+            // 查询被回复的评论
+            var parent = await _db.Comments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == comment.ParentId.Value && x.DeletedAt == null);
+
+            if (parent == null || string.IsNullOrWhiteSpace(parent.Email))
+                return;
+
+            // 不给自己发通知
+            if (string.Equals(parent.Email, comment.Email, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            // 构建邮件内容
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+            var siteUrl = Environment.GetEnvironmentVariable("PUBLIC_SITE_URL")
+                       ?? Environment.GetEnvironmentVariable("SITE_URL")
+                       ?? (env == "Development" ? "http://localhost:3000" : "");
+
+            var articleUrl = $"{siteUrl.TrimEnd('/')}/articles/{article.Slug}";
+            var siteName = (await _db.SiteSettings.AsNoTracking().FirstOrDefaultAsync())?.SiteName ?? "博客";
+
+            var subject = $"{comment.Nickname} 回复了你在《{article.Title}》的评论";
+            var htmlBody = $"""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="utf-8"></head>
+            <body style="margin:0;padding:0;background-color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;">
+                <div style="max-width:600px;margin:32px auto;padding:36px 32px;background-color:#ffffff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="text-align:center;margin-bottom:28px;">
+                        <h2 style="font-size:20px;color:#1a1a2e;margin:0;">{siteName}</h2>
+                    </div>
+                    <p style="font-size:15px;color:#333;line-height:1.8;">
+                        您好，<strong>{parent.Nickname}</strong>：
+                    </p>
+                    <p style="font-size:15px;color:#333;line-height:1.8;">
+                        您在文章 <a href="{articleUrl}" style="color:#6366f1;text-decoration:none;"><strong>《{article.Title}》</strong></a> 中的评论收到了来自 <strong>{comment.Nickname}</strong> 的回复：
+                    </p>
+                    <div style="background:#f8f9ff;border-left:4px solid #6366f1;border-radius:4px;padding:16px 20px;margin:20px 0;">
+                        <p style="font-size:14px;color:#444;line-height:1.7;margin:0;white-space:pre-wrap;">{comment.Content}</p>
+                    </div>
+                    <div style="text-align:center;margin:28px 0;">
+                        <a href="{articleUrl}#comments" target="_blank" style="display:inline-block;padding:12px 32px;background-color:#6366f1;color:#ffffff;text-decoration:none;border-radius:8px;font-size:15px;font-weight:500;">查看评论</a>
+                    </div>
+                    <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+                    <p style="font-size:12px;color:#999;text-align:center;line-height:1.6;">
+                        此邮件由系统自动发送，请勿回复。<br>
+                        如不想接收此类通知，请联系网站管理员。
+                    </p>
+                </div>
+            </body>
+            </html>
+            """;
+
+            var (success, error) = await _emailService.SendEmailAsync(parent.Email, subject, htmlBody);
+
+            if (success)
+                _logger.LogInformation("回复通知已发送: To={Email}, CommentId={CommentId}", parent.Email, comment.Id);
+            else
+                _logger.LogWarning("回复通知发送失败: To={Email}, Error={Error}", parent.Email, error);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "发送回复通知异常: CommentId={CommentId}", comment.Id);
+        }
     }
 
     #endregion

@@ -15,8 +15,14 @@ public interface ICaptchaService
     /// <summary>生成验证码图片，返回会话 ID 和 Base64 图片</summary>
     Task<CaptchaResult> GenerateAsync(string ipAddress);
 
+    /// <summary>生成滑块验证码</summary>
+    Task<SliderCaptchaResult> GenerateSliderAsync(string ipAddress);
+
     /// <summary>校验验证码</summary>
     Task<CaptchaVerifyResult> VerifyAsync(string sessionId, string answer, string ipAddress);
+
+    /// <summary>校验滑块验证码</summary>
+    Task<CaptchaVerifyResult> VerifySliderAsync(string sessionId, double percent, string ipAddress);
 }
 
 /// <summary>验证码生成结果</summary>
@@ -31,6 +37,13 @@ public class CaptchaVerifyResult
 {
     public bool Valid { get; set; }
     public string? ErrorMessage { get; set; }
+}
+
+/// <summary>滑块验证码生成结果</summary>
+public class SliderCaptchaResult
+{
+    public string SessionId { get; set; } = string.Empty;
+    public double TargetPercent { get; set; }
 }
 
 /// <summary>
@@ -141,11 +154,72 @@ public class CaptchaService : ICaptchaService
         return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 
-    /// <summary>哈希 IP 地址</summary>
-    private static string HashIp(string ip)
+    /// <summary>
+    /// 生成滑块验证码
+    /// </summary>
+    public async Task<SliderCaptchaResult> GenerateSliderAsync(string ipAddress)
     {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(ip));
-        return Convert.ToHexString(bytes).ToLowerInvariant();
+        var ipHash = HashIp(ipAddress);
+        var sessionId = Guid.NewGuid().ToString("N");
+
+        // 随机目标位置（40% - 80% 之间）
+        var random = RandomNumberGenerator.Create();
+        var bytes = new byte[2];
+        random.GetBytes(bytes);
+        var targetPercent = 0.4 + (BitConverter.ToUInt16(bytes) % 400) / 1000.0;
+
+        // 保存到数据库（复用 CaptchaSession，answer 存百分比）
+        var session = new CaptchaSession
+        {
+            SessionId = sessionId,
+            AnswerHash = targetPercent.ToString("F4"),
+            IpHash = ipHash,
+            ExpiresAt = DateTimeOffset.UtcNow.Add(Expiration),
+        };
+        _db.CaptchaSessions.Add(session);
+        await _db.SaveChangesAsync();
+
+        return new SliderCaptchaResult
+        {
+            SessionId = sessionId,
+            TargetPercent = targetPercent,
+        };
+    }
+
+    /// <summary>
+    /// 校验滑块验证码
+    /// </summary>
+    public async Task<CaptchaVerifyResult> VerifySliderAsync(string sessionId, double percent, string ipAddress)
+    {
+        var ipHash = HashIp(ipAddress);
+
+        var session = await _db.CaptchaSessions
+            .FirstOrDefaultAsync(x => x.SessionId == sessionId);
+
+        if (session == null)
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "验证码会话不存在" };
+
+        if (session.UsedAt != null)
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "验证码已使用" };
+
+        if (session.ExpiresAt < DateTimeOffset.UtcNow)
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "验证码已过期" };
+
+        if (session.IpHash != ipHash)
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "IP 不匹配" };
+
+        // 解析目标百分比，允许 5% 误差
+        if (!double.TryParse(session.AnswerHash, out var targetPercent))
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "验证码数据损坏" };
+
+        if (Math.Abs(percent / 100.0 - targetPercent) > 0.10)
+            return new CaptchaVerifyResult { Valid = false, ErrorMessage = "验证未通过" };
+
+        // 标记为已使用
+        session.UsedAt = DateTimeOffset.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return new CaptchaVerifyResult { Valid = true };
     }
 
     /// <summary>使用 SkiaSharp 绘制验证码图片</summary>
@@ -208,5 +282,12 @@ public class CaptchaService : ICaptchaService
         data.SaveTo(ms);
         var base64 = Convert.ToBase64String(ms.ToArray());
         return $"data:image/png;base64,{base64}";
+    }
+
+    /// <summary>哈希 IP 地址</summary>
+    private static string HashIp(string ip)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(ip));
+        return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 }

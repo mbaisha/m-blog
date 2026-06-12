@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { apiClient, getSiteConfig } from "@/lib/api"
 import type { ApiResponse, PublicArticleDetail, PublicArticleListItem, PublicCategoryInfo, PublicModuleLayout } from "@/types"
@@ -239,12 +240,14 @@ export default async function ArticleDetailPage({ params }: Props) {
 
           {/* Cover image (optional) */}
           {article.coverImageUrl && (
-            <div className="flex-shrink-0 w-full md:w-[360px] rounded-2xl overflow-hidden">
-              <img
+            <div className="flex-shrink-0 w-full md:w-[360px] rounded-2xl overflow-hidden relative aspect-video">
+              <Image
                 src={article.coverImageUrl}
                 alt={article.title}
-                className="w-full aspect-video object-cover"
-                loading="lazy"
+                fill
+                className="object-cover"
+                sizes="(max-width: 767px) 100vw, 360px"
+                priority
               />
             </div>
           )}

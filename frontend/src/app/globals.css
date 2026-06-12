@@ -513,3 +513,8 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ===== next/image 加载占位背景 ===== */
+img[data-nimg="fill"] {
+  background-color: var(--color-surface-secondary, #f3f4f6);
+}

@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using NpgsqlTypes;
+
 namespace Mblog.API.Models.Entities;
 
 /// <summary>
@@ -76,4 +79,8 @@ public class Article : BaseEntity, ISoftDeletable
 
     /// <summary>评论集合</summary>
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    /// <summary>全文搜索向量（PostgreSQL tsvector，自动生成）</summary>
+    [JsonIgnore]
+    public NpgsqlTsVector SearchVector { get; set; } = null!;
 }

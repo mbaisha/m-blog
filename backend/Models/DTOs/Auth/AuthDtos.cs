@@ -10,6 +10,12 @@ public class LoginRequest
 
     /// <summary>密码（明文）</summary>
     public string Password { get; set; } = string.Empty;
+
+    /// <summary>验证码会话 ID（可选）</summary>
+    public string? CaptchaSessionId { get; set; }
+
+    /// <summary>验证码答案（可选）</summary>
+    public string? CaptchaAnswer { get; set; }
 }
 
 /// <summary>

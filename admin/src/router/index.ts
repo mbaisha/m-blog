@@ -218,6 +218,12 @@ const routes: RouteRecordRaw[] = [
         name: 'ImageGenerate',
         component: () => import('@/views/ImageGenerate.vue'),
         meta: { title: '文生图', icon: 'Picture', group: 'config' }
+      },
+      {
+        path: 'backup',
+        name: 'Backup',
+        component: () => import('@/views/Backup.vue'),
+        meta: { title: '数据备份', icon: 'FolderOpened' }
       }
     ]
   }

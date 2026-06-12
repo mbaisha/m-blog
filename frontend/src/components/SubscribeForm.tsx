@@ -1,24 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export default function SubscribeForm() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
-  const [enabled, setEnabled] = useState(true)
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'}/settings`)
-      .then(res => res.json())
-      .then((data: { success: boolean; data: { subscriptionEnabled: boolean } }) => {
-        if (data.success) setEnabled(data.data.subscriptionEnabled)
-      })
-      .catch(() => {})
-  }, [])
-
-  if (!enabled) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

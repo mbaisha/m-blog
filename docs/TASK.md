@@ -865,3 +865,23 @@
 | 2026-06-11 | 分类详情页 + 标签详情页视图切换栏左侧显示"共找到 xx 篇文章"（ArticleListView 新增 totalCount prop）；标签详情页移除 hero 区域旧的文章数文本 | 中 | 已完成 |
 | 2026-06-11 | 文章列表页置顶文章去重：置顶模块启用时正常列表过滤置顶文章；置顶模块禁用时置顶文章混入列表并在封面右上角显示橙色"置顶"角标 | 高 | 已完成 |
 | 2026-06-11 | 修复 AI 写文/润色超时（API timeout 300s）+ catch 静默吞错误（改为 ElMessage.error + console.error） | 高 | 已完成 |
+| 2026-06-12 | RSS/Atom Feed 实现（/feed 端点，RSS 2.0 规范）+ 文章 enclosure 图片链接补全为完整 URL | 高 | 已完成 |
+| 2026-06-12 | Open Graph 图片自动生成（首页 + 文章详情页，Next.js ImageResponse API 动态生成） | 高 | 已完成 |
+| 2026-06-12 | 全文搜索升级：PostgreSQL tsvector/tsquery + GIN 索引，SQLite 降级为 LIKE 搜索 | 高 | 已完成 |
+| 2026-06-12 | 评论回复邮件通知：CommentService.SendReplyNotificationAsync，审核通过时自动发送回复通知邮件 | 高 | 已完成 |
+| 2026-06-12 | 图片懒加载 & WebP 优化：next.config.ts 配置 WebP/AVIF 格式，所有 `<img>` 替换为 `next/image`，创建 OptimizedImage 通用组件 | 高 | 已完成 |
+| 2026-06-12 | Sitemap 搜索引擎收录提交脚本（deploy/submit-sitemap.ps1，支持 Google/Bing/百度/IndexNow） | 中 | 已完成 |
+| 2026-06-12 | PWA 支持：manifest.ts 生成 manifest.json，sw.js 离线缓存 Service Worker，PwaRegistration 自动注册，offline 离线页面 | 中 | 已完成 |
+| 2026-06-12 | 数据库备份/导出功能：BackupController 全量 30 张表 JSON 导出（支持 ZIP 压缩），ImportService + ImportController 文件上传导入（JSON/ZIP 解析 → 清空 → 批量插入 → 详细报告） | 高 | 已完成 |
+| 2026-06-12 | 后台数据备份导入界面（Backup.vue）：数据概览置顶 + 导出/导入双栏 + 导入报告明细表格 | 中 | 已完成 |
+| 2026-06-12 | SiteSetting 新增 ReplyNotificationEnabled（评论回复邮件通知开关，后台系统设置页可切换） | 高 | 已完成 |
+| 2026-06-12 | 修复 Robots.txt Sitemap URL：改用环境变量 PUBLIC_SITE_URL/SITE_URL 替代硬编码 example.com | 高 | 已完成 |
+| 2026-06-12 | 回滚 SiteUrl 数据库字段：站点 URL 统一复用环境变量 PUBLIC_SITE_URL（SeoService/CommentService/SubscriptionService/EmailService 全部统一），后台系统设置页移除"站点地址"输入框 | 高 | 已完成 |
+| 2026-06-12 | 备份导出导入全量覆盖：BackupController.Export() 导出全部 30 张表，ImportService 导入全部 30 张表；stats 端点从 15 项扩展到 30 项；前端 Backup.vue 数据概览展示全部 30 张表统计 | 高 | 已完成 |
+| 2026-06-12 | 备份导出支持 ZIP 压缩选项：BackupController.Export([FromQuery] bool zip)，前端弹窗选择"需要压缩(.json.zip)"或"不压缩(.json)" | 高 | 已完成 |
+| 2026-06-12 | 数据导入功能：ImportController POST /api/admin/import/upload 支持上传 .json 和 .zip 文件，先清空所有表再批量导入，事务完整性保证，返回详细导入报告（每张表成功/失败数量及错误原因） | 高 | 已完成 |
+| 2026-06-12 | 修复数据导入 ArticleTag/ArticleCategory 重复追踪冲突：两阶段插入（先清除导航属性再插主表，关联表用 Entry.State=Added 逐条插入） | 高 | 已完成 |
+| 2026-06-12 | 备份导入界面优化：数据概览置顶（30 项统计网格），导出/导入双栏并排布局，导入选择文件后显示文件名+开始导入+清除按钮，导入报告明细表格 | 中 | 已完成 |
+| 2026-06-12 | 修复导入文件选择第二次不更新：el-upload 替换为原生 input[type=file]，handleFileChange 直接读 e.target.files[0] | 中 | 已完成 |
+| 2026-06-12 | 修复备份导出服务器错误：ReplyNotificationEnabled 字段缺少数据库迁移，执行 ef migrations add + database update | 高 | 已完成 |
+| 2026-06-12 | 修复登录失败页面刷新：request.ts 401 拦截器排除 /auth/login 和 /auth/refresh 接口，Login.vue 401 显示"用户名或密码错误"而非页面刷新 | 高 | 已完成 |

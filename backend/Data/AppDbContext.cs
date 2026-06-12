@@ -169,6 +169,17 @@ public class AppDbContext : DbContext
             e.HasOne(x => x.Author).WithMany(x => x.Articles).HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Restrict); // 禁止级联删除作者
             e.HasOne(x => x.Category).WithMany(x => x.Articles).HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.SetNull);
             e.HasQueryFilter(x => x.DeletedAt == null);
+
+            // PostgreSQL 全文搜索向量（SQLite 跳过）
+            if (!isSqlite)
+            {
+                e.HasGeneratedTsVectorColumn(
+                    x => x.SearchVector,
+                    "simple",  // 中文使用 simple 分词
+                    x => new { x.Title, x.Summary, x.Content })
+                  .HasIndex(x => x.SearchVector)
+                  .HasMethod("GIN");
+            }
         });
 
         // ==================== ArticleTag 文章-标签关联表 ====================

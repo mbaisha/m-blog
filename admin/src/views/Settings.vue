@@ -16,7 +16,12 @@ const form = ref({
   faviconImageId: null as string | null,
   faviconPreviewUrl: '' as string,
   commentModerationEnabled: true,
-  subscriptionEnabled: false,
+  replyNotificationEnabled: false,
+  loginCaptchaEnabled: true,
+  ipBanEnabled: true,
+  ipBanThreshold: 200,
+  ipBanWindowSeconds: 10,
+  ipBanDurationMinutes: 5,
   visitRetentionDays: 30
 })
 
@@ -34,7 +39,12 @@ async function loadSetting() {
         faviconImageId: d.faviconImageId,
         faviconPreviewUrl: d.faviconImageUrl || '',
         commentModerationEnabled: d.commentModerationEnabled,
-        subscriptionEnabled: d.subscriptionEnabled,
+        replyNotificationEnabled: d.replyNotificationEnabled ?? false,
+        loginCaptchaEnabled: d.loginCaptchaEnabled ?? true,
+        ipBanEnabled: d.ipBanEnabled ?? true,
+        ipBanThreshold: d.ipBanThreshold ?? 200,
+        ipBanWindowSeconds: d.ipBanWindowSeconds ?? 10,
+        ipBanDurationMinutes: d.ipBanDurationMinutes ?? 5,
         visitRetentionDays: d.visitRetentionDays
       }
     }
@@ -94,7 +104,12 @@ async function handleSave() {
       logoImageId: form.value.logoImageId,
       faviconImageId: form.value.faviconImageId,
       commentModerationEnabled: form.value.commentModerationEnabled,
-      subscriptionEnabled: form.value.subscriptionEnabled,
+      replyNotificationEnabled: form.value.replyNotificationEnabled,
+      loginCaptchaEnabled: form.value.loginCaptchaEnabled,
+      ipBanEnabled: form.value.ipBanEnabled,
+      ipBanThreshold: form.value.ipBanThreshold,
+      ipBanWindowSeconds: form.value.ipBanWindowSeconds,
+      ipBanDurationMinutes: form.value.ipBanDurationMinutes,
       visitRetentionDays: form.value.visitRetentionDays
     })
     ElMessage.success('站点设置已更新')
@@ -183,10 +198,54 @@ onMounted(loadSetting)
           </div>
         </el-form-item>
 
-        <el-form-item label="邮件订阅">
+        <el-form-item label="回复通知">
           <div>
-            <el-switch v-model="form.subscriptionEnabled" />
-            <span class="form-item-hint">开启后前台首页底部显示邮件订阅表单</span>
+            <el-switch v-model="form.replyNotificationEnabled" />
+            <span class="form-item-hint" v-if="form.replyNotificationEnabled">已开启，审核通过后自动发送回复通知邮件</span>
+            <span class="form-item-hint" v-else>已关闭</span>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="登录验证码">
+          <div>
+            <el-switch v-model="form.loginCaptchaEnabled" />
+            <span class="form-item-hint" v-if="form.loginCaptchaEnabled">已开启，首次登录失败后需要滑块验证</span>
+            <span class="form-item-hint" v-else>已关闭，不需要验证码</span>
+          </div>
+        </el-form-item>
+
+        <el-divider content-position="left">IP 黑名单</el-divider>
+
+        <el-form-item label="启用黑名单">
+          <div>
+            <el-switch v-model="form.ipBanEnabled" />
+            <span class="form-item-hint" v-if="form.ipBanEnabled">已开启，频繁访问 API 的 IP 将被临时拉黑</span>
+            <span class="form-item-hint" v-else>已关闭，不限制访问频率</span>
+          </div>
+        </el-form-item>
+
+        <el-form-item v-if="form.ipBanEnabled" label="请求次数阈值">
+          <div>
+            <el-input-number v-model="form.ipBanThreshold" :min="5" :max="500" />
+            <span class="form-item-hint">统计窗口内超过此次数则拉黑</span>
+          </div>
+        </el-form-item>
+        <el-form-item v-if="form.ipBanEnabled" label="统计窗口（秒）">
+          <div>
+            <el-input-number v-model="form.ipBanWindowSeconds" :min="3" :max="60" />
+            <span class="form-item-hint">在此秒数内统计请求次数</span>
+          </div>
+        </el-form-item>
+        <el-form-item v-if="form.ipBanEnabled" label="拉黑时长（分钟）">
+          <div>
+            <el-input-number v-model="form.ipBanDurationMinutes" :min="1" :max="60" />
+            <span class="form-item-hint">拉黑后拒绝访问的分钟数</span>
+          </div>
+        </el-form-item>
+        <el-form-item label="说明">
+          <div class="form-item-hint">
+            <p>短时间频繁访问 API 的 IP 会被自动拉黑（仅限 API 路由，不拦截静态资源）。</p>
+            <p>默认配置：10 秒内超过 60 次请求 → 拉黑 5 分钟。</p>
           </div>
         </el-form-item>
 

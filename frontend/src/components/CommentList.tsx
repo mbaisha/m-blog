@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { fetchComments } from "@/lib/api";
 import type { CommentItem, PagedData } from "@/types";
 import CommentForm from "./CommentForm";
@@ -24,7 +25,7 @@ function CommentAvatar({ nickname, avatar }: { nickname: string; avatar: string 
   return (
     <div className="comment-avatar">
       {avatar ? (
-        <img src={avatar} alt={nickname} className="comment-avatar-img" />
+        <Image src={avatar} alt={nickname} width={40} height={40} className="comment-avatar-img" />
       ) : (
         <div className="comment-avatar-placeholder">
           {nickname.charAt(0).toUpperCase()}

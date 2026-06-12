@@ -73,6 +73,13 @@ const menuGroups = computed<MenuGroup[]>(() => [
       { path: '/image-generate', title: '文生图', icon: 'Picture' },
       { path: '/change-password', title: '修改密码', icon: 'Lock' },
     ]
+  },
+  {
+    title: '数据管理',
+    icon: 'FolderOpened',
+    children: [
+      { path: '/backup', title: '数据备份', icon: 'Download' },
+    ]
   }
 ])
 

@@ -5,6 +5,8 @@ import DynamicFooter from "@/components/DynamicFooter";
 import ThemeProvider from "@/components/ThemeProvider";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import PwaRegistration from "@/components/PwaRegistration";
+import IpBanOverlay from "@/components/IpBanOverlay";
 import { fetchSiteSettings } from "@/lib/api";
 import "./globals.css";
 
@@ -36,9 +38,21 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     metadataBase: new URL(siteUrl),
+    manifest: "/manifest.json",
     icons: settings?.faviconImageUrl
       ? { icon: settings.faviconImageUrl, shortcut: settings.faviconImageUrl }
       : undefined,
+    alternates: {
+      types: {
+        'application/rss+xml': `${siteUrl}/feed`,
+      },
+    },
+    other: {
+      'theme-color': '#6366f1',
+      'apple-mobile-web-app-capable': 'yes',
+      'apple-mobile-web-app-status-bar-style': 'default',
+      'apple-mobile-web-app-title': siteName,
+    },
     openGraph: {
       type: "website",
       siteName,
@@ -100,6 +114,8 @@ export default async function RootLayout({
             <main className="flex-1">{children}</main>
             <DynamicFooter />
             <MobileBottomNav />
+            <PwaRegistration />
+            <IpBanOverlay />
           </ThemeProvider>
         </DarkModeProvider>
       </body>

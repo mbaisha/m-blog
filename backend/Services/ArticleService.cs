@@ -96,9 +96,22 @@ public class ArticleService : IArticleService
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
-            var keyword = query.Keyword.ToLower();
-            q = q.Where(x => x.Title.ToLower().Contains(keyword)
-                          || (x.Summary != null && x.Summary.ToLower().Contains(keyword)));
+            var keyword = query.Keyword.Trim();
+            var isNpgsql = _db.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
+
+            if (isNpgsql && keyword.Length >= 2)
+            {
+                // PostgreSQL 全文搜索（tsvector + tsquery）
+                var tsQuery = string.Join(" | ", keyword.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(k => k + ":*"));
+                q = q.Where(x => x.SearchVector.Matches(EF.Functions.ToTsQuery("simple", tsQuery)));
+            }
+            else
+            {
+                // SQLite 降级为 LIKE 搜索
+                var kw = keyword.ToLower();
+                q = q.Where(x => x.Title.ToLower().Contains(kw)
+                              || (x.Summary != null && x.Summary.ToLower().Contains(kw)));
+            }
         }
         if (!string.IsNullOrWhiteSpace(query.Status))
             q = q.Where(x => x.Status == query.Status);
@@ -503,9 +516,22 @@ public class ArticleService : IArticleService
         // 关键词搜索
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
-            var keyword = query.Keyword.ToLower();
-            q = q.Where(x => x.Title.ToLower().Contains(keyword)
-                          || (x.Summary != null && x.Summary.ToLower().Contains(keyword)));
+            var keyword = query.Keyword.Trim();
+            var isNpgsql = _db.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
+
+            if (isNpgsql && keyword.Length >= 2)
+            {
+                // PostgreSQL 全文搜索（tsvector + tsquery）
+                var tsQuery = string.Join(" | ", keyword.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(k => k + ":*"));
+                q = q.Where(x => x.SearchVector.Matches(EF.Functions.ToTsQuery("simple", tsQuery)));
+            }
+            else
+            {
+                // SQLite 降级为 LIKE 搜索
+                var kw = keyword.ToLower();
+                q = q.Where(x => x.Title.ToLower().Contains(kw)
+                              || (x.Summary != null && x.Summary.ToLower().Contains(kw)));
+            }
         }
 
         // 分类筛选

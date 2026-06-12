@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { apiClient, fetchPageLayout } from "@/lib/api"
 import type { ApiResponse, PublicProjectDetail, PublicModuleLayout } from "@/types"
@@ -168,8 +169,8 @@ export default async function ProjectDetailPage({ params }: Props) {
 
       {/* cover */}
       {isEnabled('cover') && project.coverImageUrl && (
-        <div className="aspect-video rounded-[16px] overflow-hidden mb-8 flex justify-center bg-[#F3F4F6]">
-          <img src={project.coverImageUrl} alt={project.title} className="w-full h-full object-cover" />
+        <div className="aspect-video rounded-[16px] overflow-hidden mb-8 flex justify-center bg-[#F3F4F6] relative">
+          <Image src={project.coverImageUrl} alt={project.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, 720px" priority />
         </div>
       )}
 

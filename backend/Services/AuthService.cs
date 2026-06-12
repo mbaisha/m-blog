@@ -39,8 +39,8 @@ public class JwtSettings
 /// </summary>
 public interface IAuthService
 {
-    /// <summary>执行登录验证</summary>
-    Task<LoginResponse> LoginAsync(LoginRequest request);
+    /// <summary>执行登录验证（可选验证码）</summary>
+    Task<LoginResponse> LoginAsync(LoginRequest request, string? captchaSessionId = null, string? captchaAnswer = null, string captchaIpAddress = "");
 
     /// <summary>刷新访问令牌</summary>
     Task<LoginResponse> RefreshTokenAsync(string refreshToken);
@@ -62,18 +62,51 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _db;
     private readonly JwtSettings _jwt;
+    private readonly ICaptchaService? _captchaService;
+    private readonly ILoginAttemptService? _loginAttemptService;
 
-    public AuthService(AppDbContext db, IOptions<JwtSettings> jwt)
+    public AuthService(
+        AppDbContext db,
+        IOptions<JwtSettings> jwt,
+        ICaptchaService? captchaService = null,
+        ILoginAttemptService? loginAttemptService = null)
     {
         _db = db;
         _jwt = jwt.Value;
+        _captchaService = captchaService;
+        _loginAttemptService = loginAttemptService;
     }
 
     /// <summary>
     /// 验证用户名密码，返回 JWT 令牌对
     /// </summary>
-    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request, string? captchaSessionId = null, string? captchaAnswer = null, string captchaIpAddress = "")
     {
+        // 验证码校验（如果提供了验证码信息）
+        if (!string.IsNullOrEmpty(captchaSessionId) && !string.IsNullOrEmpty(captchaAnswer))
+        {
+            if (_captchaService == null)
+                throw new InvalidOperationException("验证码服务未配置");
+
+            // 判断是滑块验证码（纯数字）还是图片验证码（非纯数字）
+            if (double.TryParse(captchaAnswer, out var sliderPercent))
+            {
+                var captchaResult = await _captchaService.VerifySliderAsync(captchaSessionId, sliderPercent, captchaIpAddress);
+                if (!captchaResult.Valid)
+                {
+                    throw new UnauthorizedAccessException(captchaResult.ErrorMessage ?? "滑块验证未通过");
+                }
+            }
+            else
+            {
+                var captchaResult = await _captchaService.VerifyAsync(captchaSessionId, captchaAnswer, captchaIpAddress);
+                if (!captchaResult.Valid)
+                {
+                    throw new UnauthorizedAccessException(captchaResult.ErrorMessage ?? "验证码错误");
+                }
+            }
+        }
+
         // 查找用户（排除软删除）
         var user = await _db.Users
             .Include(u => u.Avatar)

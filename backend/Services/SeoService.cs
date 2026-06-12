@@ -157,13 +157,16 @@ public class SeoService : ISeoService
 
     public async Task<string> GetRobotsTxtAsync()
     {
-        var siteSetting = await _siteSettingService.GetPublicAsync();
-        var baseUrl = "https://example.com"; // 默认值
+        // 站点 URL 从环境变量读取（部署时在 docker-compose.yml / .env 中配置）
+        var baseUrl = (Environment.GetEnvironmentVariable("PUBLIC_SITE_URL")
+                    ?? Environment.GetEnvironmentVariable("SITE_URL")
+                    ?? "").TrimEnd('/');
 
         return $@"User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_next/
 
 Sitemap: {baseUrl}/api/sitemap.xml
 ";

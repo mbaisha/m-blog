@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { PublicArticleListItem, PublicCategoryInfo, PublicTagInfo, PublicProjectListItem, PublicSiteSettingResponse, PublicModuleLayout } from '@/types'
 import ScrollReveal from './ScrollReveal'
 import BackToTop from './BackToTop'
@@ -236,7 +237,7 @@ export default function HomeContent(props: HomeContentProps) {
               style={{ color: showOverlay ? '#fff' : 'var(--color-text-primary, #1F2937)' }}
             >
               {logoUrl && !title ? (
-                <img src={logoUrl} alt={siteName} className="h-[36px] w-auto object-contain inline-block" />
+                <Image src={logoUrl} alt={siteName} width={120} height={36} className="h-[36px] w-auto object-contain inline-block" />
               ) : null}
               {resolvedTitle}
             </h1>
@@ -338,7 +339,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex flex-col rounded-[12px] overflow-hidden transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
                       <div className="relative w-full overflow-hidden bg-[#F3F4F6]" style={{ aspectRatio: '16/9' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" /> : null}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" /> : null}
                         {cats.length > 0 && (
                           <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                             {cats.map((cat) => <span key={cat.id} className="px-2 py-0.5 rounded-[4px] text-[8px] font-medium" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: catBrand.text }}>{cat.name}</span>)}
@@ -378,7 +379,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
                       <div className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[20px] font-bold" style={{ backgroundColor: article.coverImageUrl ? 'var(--color-border-light, #F3F4F6)' : catBrand.bg || '#EEEDFE', color: catBrand.text || '#534AB7' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-[14px] font-medium leading-snug truncate" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -447,7 +448,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: "0.5px solid var(--color-border, #E5E7EB)", backgroundColor: "var(--card-bg, #fff)", boxShadow: "var(--card-shadow, none)" }}>
                       <div className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[20px] font-bold" style={{ backgroundColor: article.coverImageUrl ? 'var(--color-border-light, #F3F4F6)' : catBrand.bg || '#EEEDFE', color: catBrand.text || '#534AB7' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-[14px] font-medium leading-snug truncate" style={{ color: "var(--color-text-primary, #1F2937)" }}>{article.title}</h3>
@@ -478,7 +479,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex flex-col rounded-[12px] overflow-hidden transition-all hover:-translate-y-0.5" style={{ border: "0.5px solid var(--color-border, #E5E7EB)", backgroundColor: "var(--card-bg, #fff)", boxShadow: "var(--card-shadow, none)" }}>
                       <div className="relative w-full overflow-hidden bg-[#F3F4F6]" style={{ aspectRatio: '16/9' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" /> : null}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" /> : null}
                         {cats.length > 0 && (
                           <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                             {cats.map((cat) => <span key={cat.id} className="px-2 py-0.5 rounded-[4px] text-[8px] font-medium" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: catBrand.text }}>{cat.name}</span>)}
@@ -532,7 +533,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex flex-col rounded-[12px] overflow-hidden transition-all hover:-translate-y-0.5" style={{ border: "0.5px solid var(--color-border, #E5E7EB)", backgroundColor: "var(--card-bg, #fff)", boxShadow: "var(--card-shadow, none)" }}>
                       <div className="relative w-full overflow-hidden bg-[#F3F4F6]" style={{ aspectRatio: '16/9' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" /> : null}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" /> : null}
                         {cats.length > 0 && (
                           <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                             {cats.map((cat) => <span key={cat.id} className="px-2 py-0.5 rounded-[4px] text-[8px] font-medium" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: catBrand.text }}>{cat.name}</span>)}
@@ -568,7 +569,7 @@ export default function HomeContent(props: HomeContentProps) {
                   return (
                     <Link key={article.id} href={`/articles/${article.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: "0.5px solid var(--color-border, #E5E7EB)", backgroundColor: "var(--card-bg, #fff)", boxShadow: "var(--card-shadow, none)" }}>
                       <div className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[20px] font-bold" style={{ backgroundColor: article.coverImageUrl ? 'var(--color-border-light, #F3F4F6)' : catBrand.bg || '#EEEDFE', color: catBrand.text || '#534AB7' }}>
-                        {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
+                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-[14px] font-medium leading-snug truncate" style={{ color: "var(--color-text-primary, #1F2937)" }}>{article.title}</h3>
@@ -609,7 +610,7 @@ export default function HomeContent(props: HomeContentProps) {
               {projects.map((project) => (
                 <Link key={project.id} href={`/projects/${project.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: "0.5px solid var(--color-border, #E5E7EB)", backgroundColor: "var(--card-bg, #fff)", boxShadow: "var(--card-shadow, none)" }}>
                   {project.coverImageUrl ? (
-                    <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden flex-shrink-0"><img src={project.coverImageUrl} alt={project.title} className="w-full h-full object-cover" loading="lazy" /></div>
+                    <div className="w-[48px] h-[48px] rounded-[8px] overflow-hidden flex-shrink-0 relative"><Image src={project.coverImageUrl} alt={project.title} fill className="object-cover" sizes="48px" loading="lazy" /></div>
                   ) : (
                     <div className="w-[48px] h-[48px] rounded-[8px] flex items-center justify-center text-[18px] font-bold flex-shrink-0" style={{ backgroundColor: "var(--color-primary-light, #EEEDFE)", color: "var(--color-primary, #6366F1)" }}>{getFirstValidChar(project.title)}</div>
                   )}

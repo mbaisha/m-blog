@@ -27,6 +27,18 @@ public class CaptchaVerifyRequest
 }
 
 /// <summary>
+/// 滑块验证码校验请求
+/// </summary>
+public class SliderVerifyRequest
+{
+    /// <summary>验证码会话 ID</summary>
+    public string SessionId { get; set; } = string.Empty;
+
+    /// <summary>滑块位置百分比（0-100）</summary>
+    public double Percent { get; set; }
+}
+
+/// <summary>
 /// 前台提交评论请求
 /// </summary>
 public class CreateCommentRequest

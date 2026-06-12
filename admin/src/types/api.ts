@@ -11,6 +11,8 @@ export interface ApiResponse<T = unknown> {
 export interface LoginRequest {
   username: string
   password: string
+  captchaSessionId?: string
+  captchaAnswer?: string
 }
 
 /** 登录响应 */

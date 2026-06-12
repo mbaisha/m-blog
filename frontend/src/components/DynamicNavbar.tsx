@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import type { PublicNavigationItem } from '@/types'
 import { apiClient } from '@/lib/api'
@@ -296,7 +297,7 @@ export default function DynamicNavbar() {
             style={{ color: 'var(--color-text-primary)' }}
           >
             {logoUrl ? (
-              <img src={logoUrl} alt={siteName || 'logo'} className="h-[30px] w-auto object-contain" />
+              <Image src={logoUrl} alt={siteName || 'logo'} width={120} height={30} className="h-[30px] w-auto object-contain" />
             ) : (
               siteName ? (
                 <><span style={{ color: 'var(--color-primary)' }}>{siteName.charAt(0)}</span>{siteName.slice(1)}</>
@@ -388,7 +389,7 @@ export default function DynamicNavbar() {
           <div className="flex items-center gap-1 flex-1 min-w-0">
             {/* 移动端 Logo */}
             {logoUrl ? (
-              <img src={logoUrl} alt={siteName || 'logo'} className="h-[26px] w-auto object-contain mr-4" />
+              <Image src={logoUrl} alt={siteName || 'logo'} width={100} height={26} className="h-[26px] w-auto object-contain mr-4" />
             ) : (
               <span className="md:hidden text-[17px] font-bold tracking-tight whitespace-nowrap mr-4"
                 style={{ color: 'var(--color-text-primary)' }}>
