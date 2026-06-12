@@ -110,7 +110,9 @@ MBlog 是一个**可直接上线的开源个人博客平台**，采用三层架�
 | **访问统计** | `VisitController`, `PublicVisitController` — 上报、计数、分页记录、统计、清理 |
 | **归档** | `PublicArchiveController` — 年月时间线 |
 | **友情链接** | `FriendController`, `PublicFriendController` — CRUD、公开列表 |
-| **验证码** | `CaptchaController` — 验证码生成与校验 |
+| **验证码** | `CaptchaController` — 验证码生成与校验（图形+滑块） |
+| **登录尝试** | `LoginAttemptService` — 基于 IP 的失败计数与锁定 |
+| **IP 黑名单** | `IpBanMiddleware` — 内存频率统计、阈值触发拉黑 |
 | **大模型/AI** | `LlmController` — 模型配置、AI 文章/SEO/封面/润色 |
 | **文生图** | `ImageGenController` — 文生图配置与生成 |
 | **邮件** | `EmailSettingController`, `EmailLogController` — SMTP 配置、模板、发送记录 |
@@ -145,6 +147,8 @@ MBlog 是一个**可直接上线的开源个人博客平台**，采用三层架�
 | **IP 隐私** | 访客 IP 哈希存储 |
 | **跨域配置** | 可配置的 CORS 策略 |
 | **频率限制** | 内置 API 频率限制 |
+| **登录验证码** | 首次登录失败后出现滑块验证码（拖拽到标记线），5 次失败锁定 15 分钟，后台可配置开关 |
+| **IP 黑名单** | 内存 IP 访问频率统计，超过阈值自动拉黑，仅拦截 API 路由，跳过静态资源和高频 API，阈值/窗口/时长/开关均可配置，前台收到 429 时全屏覆盖显示倒计时 |
 
 ### 🔧 性能与 SEO
 
@@ -247,8 +251,9 @@ m-blog/
 │   │   │   ├── [slug]/            # 自定义页面
 │   │   │   ├── sitemap.ts         # 动态站点地图
 │   │   │   └── layout.tsx         # 根布局（导航栏+页脚）
-│   │   ├── components/            # 可复用 UI 组件
+│   │   ├── components/            # 可复用 UI 组件（IpBanOverlay 等）
 │   │   └── lib/                   # API 客户端与工具
+│   ├── scripts/                   # 辅助脚本（generate-icons.js）
 │   └── Dockerfile
 │
 ├── admin/                         # Vue 3 后台管理

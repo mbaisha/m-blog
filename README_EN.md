@@ -110,7 +110,9 @@ MBlog is a **production-ready open-source personal blog platform** built with a 
 | **Visits & Stats** | `VisitController`, `PublicVisitController` — Track, count, paged records, stats, cleanup |
 | **Archive** | `PublicArchiveController` — Year/month timeline |
 | **Friends** | `FriendController`, `PublicFriendController` — CRUD, public list |
-| **Captcha** | `CaptchaController` — CAPTCHA generation & verification |
+| **Captcha** | `CaptchaController` — CAPTCHA generation & verification (image + slider) |
+| **Login Attempt** | `LoginAttemptService` — IP-based failure counting & lockout |
+| **IP Blacklist** | `IpBanMiddleware` — In-memory frequency tracking, threshold-based ban |
 | **LLM / AI** | `LlmController` — Model config, AI article/SEO/cover/polish |
 | **Image Generation** | `ImageGenController` — Text-to-image config & generation |
 | **Email** | `EmailSettingController`, `EmailLogController` — SMTP config, templates, send logs |
@@ -145,6 +147,8 @@ MBlog is a **production-ready open-source personal blog platform** built with a 
 | **IP Privacy** | IP hashing for visitor storage |
 | **CORS** | Configurable cross-origin policies |
 | **Rate Limiting** | Built-in rate limiter for API abuse prevention |
+| **Login CAPTCHA** | Slider CAPTCHA after first failed login attempt, 5 failures locks IP for 15 minutes, configurable toggle |
+| **IP Blacklist** | In-memory IP frequency tracking, auto-ban on threshold exceed, API-only interception, skips static assets and high-frequency endpoints, configurable threshold/window/duration/toggle, full-screen overlay with countdown on 429 |
 
 ### 🔧 Performance & SEO
 
@@ -247,8 +251,9 @@ m-blog/
 │   │   │   ├── [slug]/            # Custom pages
 │   │   │   ├── sitemap.ts         # Dynamic sitemap
 │   │   │   └── layout.tsx         # Root layout with navbar/footer
-│   │   ├── components/            # Reusable UI components
+│   │   ├── components/            # Reusable UI components (IpBanOverlay, etc.)
 │   │   └── lib/                   # API client & utilities
+│   ├── scripts/                   # Utility scripts (generate-icons.js)
 │   └── Dockerfile
 │
 ├── admin/                         # Vue 3 admin panel

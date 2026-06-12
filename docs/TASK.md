@@ -885,3 +885,13 @@
 | 2026-06-12 | 修复导入文件选择第二次不更新：el-upload 替换为原生 input[type=file]，handleFileChange 直接读 e.target.files[0] | 中 | 已完成 |
 | 2026-06-12 | 修复备份导出服务器错误：ReplyNotificationEnabled 字段缺少数据库迁移，执行 ef migrations add + database update | 高 | 已完成 |
 | 2026-06-12 | 修复登录失败页面刷新：request.ts 401 拦截器排除 /auth/login 和 /auth/refresh 接口，Login.vue 401 显示"用户名或密码错误"而非页面刷新 | 高 | 已完成 |
+| 2026-06-12 | 登录滑块验证码：LoginAttemptService 基于 IP 的失败计数器，首次失败后出现滑块验证码（拖拽到标记线位置），5 次失败锁定 15 分钟，后台系统设置页可配置开关 | 高 | 已完成 |
+| 2026-06-12 | 修复滑块验证码 NPE（SiteSetting 空行检查）+ 滑块频繁失败（VerifySliderAsync）+ 误差从 5% 放宽到 10% | 高 | 已完成 |
+| 2026-06-12 | 修复滑块验证码 IP 不匹配：AuthService.LoginAsync 接收真实 IP 传给 VerifySliderAsync，生成和校验使用同一 IP | 高 | 已完成 |
+| 2026-06-12 | 修复后台关闭登录验证码无效：PublicSiteSettingResponse 新增 LoginCaptchaEnabled 字段，GetPublicAsync 返回该值 | 高 | 已完成 |
+| 2026-06-12 | SubscriptionEnabled 完整移除：SiteSetting 实体/DTO/Service 全部移除该字段，数据库迁移 RemoveSubscriptionEnabled，后台 Settings.vue 移除邮件订阅开关，SubscribeForm.tsx 移除开关检测逻辑 | 高 | 已完成 |
+| 2026-06-12 | 修复 request.ts 残留 `` 字符导致 TypeScript 构建错误 | 高 | 已完成 |
+| 2026-06-12 | IP 黑名单中间件（IpBanMiddleware）：内存 ConcurrentDictionary 存储，仅拦截 /api/* 路由，可配置请求次数阈值/统计窗口（秒）/拉黑时长（分钟）/启用开关，跳过高频 API（访问追踪/验证码/健康检查/站点设置），429 响应含 retryAfterSeconds 字段 | 高 | 已完成 |
+| 2026-06-12 | SiteSetting 新增 IpBanEnabled 字段，数据库迁移 AddIpBanEnabled，后台系统设置页 IP 黑名单区域新增启用开关，配置项按开关显隐 | 高 | 已完成 |
+| 2026-06-12 | 前台 429 全屏覆盖（IpBanOverlay）：拦截全局 fetch 检测 429，立即清空 body 内容，显示全屏覆盖（白底红色倒计时+刷新重试按钮），自第一次收到 429 开始倒计时，刷新页面只显示剩余时间不重置，倒计时归零自动恢复 | 高 | 已完成 |
+| 2026-06-12 | PWA 图标生成：scripts/generate-icons.js 纯 Node.js 脚本（无外部依赖）生成 192x192/512x512 indigo 底色圆角矩形 PNG 图标 | 中 | 已完成 |
