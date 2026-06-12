@@ -62,7 +62,7 @@ export default function Statistics({ config }: StatisticsProps) {
   if (visibleItems.length === 0) return null
 
   return (
-    <div className="grid gap-4" style={{
+    <div className="grid gap-4 article-grid-responsive" style={{
       gridTemplateColumns: `repeat(${Math.min(visibleItems.length, 4)}, 1fr)`,
     }}>
       {visibleItems.map((item) => (

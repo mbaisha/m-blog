@@ -58,8 +58,8 @@ export default function ShareTools({ url, title }: Props) {
     }
   }
 
-  /** 二维码图片 URL */
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`
+  /** 二维码图片 URL — 使用当前页面真实地址，不依赖构建时传入的 url prop */
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : url)}`
 
   return (
     <div>

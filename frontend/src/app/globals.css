@@ -506,3 +506,10 @@ body {
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ===== 手机端文章卡片强制单列 ===== */
+@media (max-width: 767px) {
+  .article-grid-responsive {
+    grid-template-columns: 1fr !important;
+  }
+}

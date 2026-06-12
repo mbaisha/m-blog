@@ -65,7 +65,7 @@ export default function ArticleListView({ articles, showCategories = true, showT
 
       {/* Card View */}
       {viewMode === 'card' && (
-        <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(Math.max(columns, 2), 4)}, minmax(0, 1fr))` }}>
+        <div className="grid gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${Math.min(Math.max(columns, 2), 4)}, minmax(0, 1fr))` }}>
           {articles.map((article) => (
             <ArticleCard
               key={article.id}

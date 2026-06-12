@@ -155,7 +155,7 @@ function renderUniversalModule(mod: PublicModuleLayout): React.ReactNode {
         <ScrollReveal>
           <div className={mod.title ? 'mt-6' : ''}>
             {mod.title && <h2 className="text-[16px] font-medium mb-5" style={{ color: 'var(--color-text-primary)' }}>{mod.title}</h2>}
-            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(columns, 4)}, 1fr)` }}>
+            <div className="grid gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${Math.min(columns, 4)}, 1fr)` }}>
               {items.map((item: any, i: number) => (
                 <div key={i} className="flex gap-3 items-start rounded-[10px] p-4" style={{ border: '0.5px solid var(--color-border)', backgroundColor: 'var(--card-bg)' }}>
                   <span className="text-2xl flex-shrink-0">{item.icon || '📌'}</span>

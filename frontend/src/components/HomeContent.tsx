@@ -331,7 +331,7 @@ export default function HomeContent(props: HomeContentProps) {
           <section className="mt-8">
             <SectionHeader title="置顶文章" href="/articles" />
             {displayStyle === 'card' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
                 {pinnedArticles.map((article) => {
                   const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
                   const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors['其他']
@@ -471,7 +471,7 @@ export default function HomeContent(props: HomeContentProps) {
                 })}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(columns, 4)}, minmax(0, 1fr))` }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${Math.min(columns, 4)}, minmax(0, 1fr))` }}>
                 {items.map((article) => {
                   const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
                   const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors["其他"]
@@ -525,7 +525,7 @@ export default function HomeContent(props: HomeContentProps) {
           <section className="mt-10">
             <SectionHeader title="最新文章" href="/articles" />
             {displayStyle === 'card' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
                 {items.map((article) => {
                   const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
                   const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors["其他"]

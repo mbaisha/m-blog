@@ -405,7 +405,7 @@ export default function ArticlesPageContent({
                       <h2 className="text-[16px] font-medium" style={{ color: 'var(--color-text-primary)' }}>置顶文章</h2>
                     </div>
                     {displayStyle === 'card' ? (
-                      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+                      <div className="grid gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
                         {pinned.map(article => (
                           <ArticleCard key={article.id} article={article} viewMode="card" showCategories={true} showTags={true} />
                         ))}
@@ -426,7 +426,7 @@ export default function ArticlesPageContent({
           {/* ===== Articles Grid / List ===== */}
           {isEnabled('article_list') && loading && (
             <div
-              className={viewMode === 'card' ? 'grid gap-4' : 'flex flex-col gap-2'}
+              className={viewMode === 'card' ? 'grid gap-4 article-grid-responsive' : 'flex flex-col gap-2'}
               style={viewMode === 'card' ? { gridTemplateColumns: `repeat(${articleListColumns}, minmax(0, 1fr))` } : undefined}
             >
               {Array.from({ length: 6 }).map((_, i) => (
@@ -446,7 +446,7 @@ export default function ArticlesPageContent({
             <>
               {/* Card View */}
               {viewMode === 'card' && (
-                <div className="grid gap-5" style={{ gridTemplateColumns: `repeat(${articleListColumns}, minmax(0, 1fr))` }}>
+                <div className="grid gap-5 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${articleListColumns}, minmax(0, 1fr))` }}>
                   {displayArticles.map((article) => {
                     const catBrand = article.category ? getCategoryBrand(article.category.name) : categoryBrandColors["其他"]
                     const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])

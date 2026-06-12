@@ -138,9 +138,54 @@ function computeCssVars(theme: any): Record<string, string> {
   const cardShadowHover = shadowLg
   const cardTransition = 'all 0.2s ease'
 
-  const tagBg = light ? '#f3f4f6' : 'rgba(255,255,255,0.06)'
-
   const progressBg = `linear-gradient(90deg, ${primary}, ${lighten(primary, 0.3)})`
+
+  // 输入框
+  const inputBg = surface
+  const inputBorder = `0.5px solid ${border}`
+  const inputFocusBorder = `0.5px solid ${primary}`
+  const inputFocusShadow = `0 0 0 2px ${lighten(primary, 0.85)}`
+
+  // 标签
+  const tagBg = surfaceSecondary
+  const tagHoverBg = lighten(primary, 0.9)
+  const tagActiveBg = light ? lighten(primary, 0.85) : `${primary}1f`
+
+  // 按钮 hover / active
+  const btnPrimaryHover = darken(primary, 0.08)
+  const btnPrimaryActive = darken(primary, 0.15)
+  const btnSecondaryHover = light ? '#f3f4f6' : 'rgba(255,255,255,0.06)'
+  const btnSecondaryActive = light ? '#e5e7eb' : 'rgba(255,255,255,0.1)'
+
+  // 选中高亮
+  const selectionBg = `${primary}30`
+  const selectionText = text
+
+  // 引用块
+  const blockquoteBorder = primary
+  const blockquoteBg = light ? lighten(primary, 0.92) : `${primary}12`
+
+  // 表格
+  const tableStripeBg = light ? '#f9fafb' : 'rgba(255,255,255,0.03)'
+  const tableBorder = `0.5px solid ${border}`
+
+  // 滚动条
+  const scrollbarThumb = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)'
+  const scrollbarTrack = 'transparent'
+
+  // 搜索高亮
+  const searchHighlightBg = `${accent}40`
+  const searchHighlightText = text
+
+  // 骨架屏
+  const skeletonBg = light ? '#e5e7eb' : '#334155'
+  const skeletonShine = light ? '#f3f4f6' : '#475569'
+
+  // 分隔线
+  const dividerColor = light ? '#f3f4f6' : '#1e293b'
+
+  // 遮罩层
+  const overlayBg = light ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.6)'
 
   return {
     // ========== 品牌 & 中性色 ==========
@@ -216,12 +261,56 @@ function computeCssVars(theme: any): Record<string, string> {
     '--card-shadow-hover': cardShadowHover,
     '--card-transition': cardTransition,
 
-    // ========== 标签 ==========
-    '--tag-bg': tagBg,
-
     // ========== 阅读进度条 ==========
     '--progress-height': '3px',
     '--progress-bg': progressBg,
+
+    // ========== 输入框 ==========
+    '--input-bg': inputBg,
+    '--input-border': inputBorder,
+    '--input-focus-border': inputFocusBorder,
+    '--input-focus-shadow': inputFocusShadow,
+
+    // ========== 标签 ==========
+    '--tag-bg': tagBg,
+    '--tag-hover-bg': tagHoverBg,
+    '--tag-active-bg': tagActiveBg,
+
+    // ========== 按钮 ==========
+    '--btn-primary-hover': btnPrimaryHover,
+    '--btn-primary-active': btnPrimaryActive,
+    '--btn-secondary-hover': btnSecondaryHover,
+    '--btn-secondary-active': btnSecondaryActive,
+
+    // ========== 选中高亮 ==========
+    '--selection-bg': selectionBg,
+    '--selection-text': selectionText,
+
+    // ========== 引用块 ==========
+    '--blockquote-border': blockquoteBorder,
+    '--blockquote-bg': blockquoteBg,
+
+    // ========== 表格 ==========
+    '--table-stripe-bg': tableStripeBg,
+    '--table-border': tableBorder,
+
+    // ========== 滚动条 ==========
+    '--scrollbar-thumb': scrollbarThumb,
+    '--scrollbar-track': scrollbarTrack,
+
+    // ========== 搜索高亮 ==========
+    '--search-highlight-bg': searchHighlightBg,
+    '--search-highlight-text': searchHighlightText,
+
+    // ========== 骨架屏 ==========
+    '--skeleton-bg': skeletonBg,
+    '--skeleton-shine': skeletonShine,
+
+    // ========== 分隔线 ==========
+    '--divider-color': dividerColor,
+
+    // ========== 遮罩层 ==========
+    '--overlay-bg': overlayBg,
 
     // ========== Legacy 别名 ==========
     '--theme-primary': primary,
