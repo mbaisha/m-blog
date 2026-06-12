@@ -68,6 +68,30 @@ public class CaptchaService : ICaptchaService
     /// </summary>
     public async Task<CaptchaResult> GenerateAsync(string ipAddress)
     {
+        try
+        {
+            return await GenerateAsyncInternal(ipAddress);
+        }
+        catch (Exception ex)
+        {
+            // 记录详细错误信息用于排查
+            Console.Error.WriteLine($"[Captcha] GenerateAsync 失败: {ex.GetType().FullName}: {ex.Message}");
+            if (ex.InnerException != null)
+                Console.Error.WriteLine($"[Captcha] 内部异常: {ex.InnerException.GetType().FullName}: {ex.InnerException.Message}");
+            Console.Error.WriteLine($"[Captcha] 堆栈: {ex.StackTrace}");
+
+            // 返回一个占位验证码，前端显示"验证码加载失败"
+            return new CaptchaResult
+            {
+                SessionId = Guid.NewGuid().ToString("N"),
+                ImageBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+            };
+        }
+    }
+
+    /// <summary>生成验证码图片（内部方法）</summary>
+    private async Task<CaptchaResult> GenerateAsyncInternal(string ipAddress)
+    {
         // 1. 生成随机验证码（纯数字，易于识别）
         var code = GenerateRandomCode(CodeLength);
         var ipHash = HashIp(ipAddress);
@@ -222,78 +246,112 @@ public class CaptchaService : ICaptchaService
         return new CaptchaVerifyResult { Valid = true };
     }
 
-    private static SKTypeface GetCaptchaFont()
-    {
-        // 尝试多种字体（按优先级），Linux Docker 中 Arial 不可用
-        foreach (var family in new[] { "DejaVu Sans", "Arial", "Tahoma", "Verdana", "sans-serif" })
-        {
-            var typeface = SKTypeface.FromFamilyName(family, SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
-            if (typeface?.FamilyName != null && !typeface.FamilyName.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
-                return typeface;
-        }
-        return SKTypeface.Default;
-    }
-
-    /// <summary>使用 SkiaSharp 绘制验证码图片</summary>
+    /// <summary>
+    /// 使用 SkiaSharp 绘制验证码图片（字体渲染，跨平台兼容）
+    /// </summary>
     private static string DrawCaptchaImage(string code)
     {
         using var bitmap = new SKBitmap(ImageWidth, ImageHeight);
         using var canvas = new SKCanvas(bitmap);
 
-        // 白色背景
-        canvas.Clear(SKColors.White);
+        // 浅灰背景
+        canvas.Clear(new SKColor(245, 247, 250));
 
-        // 随机噪点
         var random = new Random();
-        using var noisePaint = new SKPaint { Color = new SKColor(200, 200, 200), StrokeWidth = 1 };
 
-        // 干扰线
-        for (int i = 0; i < 3; i++)
+        // 背景干扰点（浅色小圆点）
+        using var bgDotPaint = new SKPaint
+        {
+            Color = new SKColor(200, 210, 220, 120),
+            IsAntialias = true,
+        };
+        for (int i = 0; i < 30; i++)
+        {
+            canvas.DrawCircle(
+                random.Next(0, ImageWidth), random.Next(0, ImageHeight),
+                random.Next(1, 3), bgDotPaint);
+        }
+
+        // 干扰线（彩色弧线，不遮挡文字）
+        for (int i = 0; i < 2; i++)
         {
             using var linePaint = new SKPaint
             {
-                Color = new SKColor((byte)random.Next(150, 220), (byte)random.Next(150, 220), (byte)random.Next(150, 220)),
-                StrokeWidth = 1,
+                Color = new SKColor((byte)random.Next(180, 230), (byte)random.Next(180, 230), (byte)random.Next(200, 240)),
+                StrokeWidth = 1.5f,
                 IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
             };
-            canvas.DrawLine(
-                random.Next(0, ImageWidth), random.Next(0, ImageHeight),
-                random.Next(0, ImageWidth), random.Next(0, ImageHeight),
-                linePaint);
+            var linePath = new SKPath();
+            linePath.MoveTo(0, random.Next(5, ImageHeight - 5));
+            linePath.CubicTo(
+                ImageWidth / 3f, random.Next(5, ImageHeight - 5),
+                ImageWidth * 2 / 3f, random.Next(5, ImageHeight - 5),
+                ImageWidth, random.Next(5, ImageHeight - 5));
+            canvas.DrawPath(linePath, linePaint);
         }
 
-        // 噪点
-        for (int i = 0; i < 80; i++)
-        {
-            canvas.DrawPoint(random.Next(0, ImageWidth), random.Next(0, ImageHeight), noisePaint);
-        }
+        // 获取字体（Linux 下 DejaVu Sans 已安装）
+        using var typeface = GetBestTypeface();
+        using var font = new SKFont(typeface, 26);
 
-        // 绘制验证码字符（使用回退字体）
-        using var font = new SKFont(GetCaptchaFont(), 24);
-        var textWidth = code.Length * 20;
-        var startX = (ImageWidth - textWidth) / 2;
-        var y = ImageHeight / 2 + 8;
+        // 测量文字总宽度
+        var totalWidth = font.MeasureText(code);
+        var startX = (ImageWidth - totalWidth) / 2;
+        var startY = ImageHeight / 2f + 9;
 
+        // 逐字符绘制，每个字符不同颜色和轻微旋转
         for (int i = 0; i < code.Length; i++)
         {
+            var ch = code[i].ToString();
+
+            // 字符宽度
+            var charWidth = font.MeasureText(ch);
+
+            // 随机颜色（深色系，好识别）
+            var color = new SKColor(
+                (byte)random.Next(20, 80),
+                (byte)random.Next(20, 80),
+                (byte)random.Next(80, 180));
+
             using var textPaint = new SKPaint
             {
-                Color = new SKColor(
-                    (byte)random.Next(30, 100),
-                    (byte)random.Next(30, 100),
-                    (byte)random.Next(30, 180)),
+                Color = color,
                 IsAntialias = true,
             };
-            canvas.DrawText(code[i].ToString(), startX + i * 22, y, SKTextAlign.Left, font, textPaint);
+
+            // 轻微旋转和垂直偏移
+            var angle = (random.NextDouble() - 0.5) * 15; // ±7.5 度
+            var yOffset = (random.NextDouble() - 0.5) * 6; // ±3px
+
+            canvas.Save();
+            canvas.RotateDegrees((float)angle, startX + charWidth / 2, startY);
+            canvas.DrawText(ch, startX, startY + (float)yOffset, font, textPaint);
+            canvas.Restore();
+
+            startX += charWidth + 3;
         }
 
         // 输出为 PNG Base64
         using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 80);
+        using var data = image.Encode(SKEncodedImageFormat.Png, 85);
         using var ms = new MemoryStream();
         data.SaveTo(ms);
         var base64 = Convert.ToBase64String(ms.ToArray());
         return $"data:image/png;base64,{base64}";
+    }
+
+    /// <summary>获取最佳可用字体（Linux/Windows 跨平台）</summary>
+    private static SKTypeface GetBestTypeface()
+    {
+        // 尝试加载系统字体
+        foreach (var family in new[] { "DejaVu Sans", "Arial", "Tahoma", "Verdana", "Helvetica" })
+        {
+            var tf = SKTypeface.FromFamilyName(family, SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
+            if (tf != null && !string.IsNullOrEmpty(tf.FamilyName))
+                return tf;
+        }
+        return SKTypeface.Default;
     }
 
     /// <summary>哈希 IP 地址</summary>

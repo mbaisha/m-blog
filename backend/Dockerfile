@@ -15,9 +15,10 @@ WORKDIR /app
 EXPOSE 5000
 EXPOSE 5001
 
-# 安装字体（验证码生成需要）
+# 安装字体及 SkiaSharp Linux 依赖（验证码生成需要）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-dejavu-core \
+    libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建上传目录和日志目录
