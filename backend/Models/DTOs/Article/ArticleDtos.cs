@@ -82,6 +82,15 @@ public class CreateArticleRequest
 
     /// <summary>SEO 关键词</summary>
     public string? SeoKeywords { get; set; }
+
+    /// <summary>指定发布时间（UTC），为空则使用当前时间。用于数据迁移</summary>
+    public DateTimeOffset? PublishedAt { get; set; }
+
+    /// <summary>指定创建时间（UTC），为空则使用数据库默认值。用于数据迁移</summary>
+    public DateTimeOffset? CreatedAt { get; set; }
+
+    /// <summary>指定更新时间（UTC），为空则使用数据库默认值。用于数据迁移</summary>
+    public DateTimeOffset? UpdatedAt { get; set; }
 }
 
 /// <summary>

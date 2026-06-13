@@ -79,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const pages = pagesRes?.data || []
     pageRoutes = (Array.isArray(pages) ? pages : []).map((page: any) => ({
-      url: `${BASE_URL}/${page.slug}`,
+      url: `${BASE_URL}/pages/${page.slug}`,
       lastModified: new Date(page.updatedAt || page.createdAt || new Date()),
       changeFrequency: 'monthly' as const,
       priority: 0.5,

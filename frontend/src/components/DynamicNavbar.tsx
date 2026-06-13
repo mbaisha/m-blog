@@ -126,7 +126,7 @@ export default function DynamicNavbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?keywords=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/search?keyword=${encodeURIComponent(searchQuery.trim())}`)
       setSearchOpen(false)
       setSearchQuery('')
       setMobileOpen(false)

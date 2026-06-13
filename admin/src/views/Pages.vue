@@ -9,6 +9,9 @@ const router = useRouter()
 const loading = ref(false)
 const pages = ref<PageListItem[]>([])
 
+/** 前台站点 URL */
+const siteUrl = import.meta.env.VITE_SITE_URL || 'http://localhost:3000'
+
 async function loadPages() {
   loading.value = true
   try {
@@ -52,7 +55,16 @@ onMounted(loadPages)
           <template #default="{ row }">{{ row.sortOrder }}</template>
         </el-table-column>
         <el-table-column label="标题" min-width="180">
-          <template #default="{ row }">{{ row.title }}</template>
+          <template #default="{ row }">
+            <a
+              v-if="row.status === 'published'"
+              :href="`${siteUrl}/pages/${row.slug}`"
+              target="_blank"
+              class="title-link"
+              :title="`前台浏览：${row.title}`"
+            >{{ row.title }}</a>
+            <span v-else>{{ row.title }}</span>
+          </template>
         </el-table-column>
         <el-table-column label="URL 标识" min-width="140">
           <template #default="{ row }"><code>/{{ row.slug }}</code></template>
@@ -87,4 +99,12 @@ onMounted(loadPages)
 .pages-page { padding: 0; }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .page-header h3 { margin: 0; font-size: 20px; }
+.title-link {
+  color: #409eff;
+  text-decoration: none;
+}
+.title-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
+}
 </style>

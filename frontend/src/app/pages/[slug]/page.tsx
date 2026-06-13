@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: page.seoTitle || page.title,
         description: page.seoDescription || page.summary || '',
         type: 'article',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/${slug}`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pages/${slug}`,
       },
       twitter: {
         card: 'summary_large_image',
@@ -64,7 +64,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="content-container py-12">
-      <VisitTracker pagePath={`/${slug}`} />
+      <VisitTracker pagePath={`/pages/${slug}`} />
       <article className="mx-auto max-w-[800px]">
         <header className="mb-8">
           <h1 className="text-[24px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>

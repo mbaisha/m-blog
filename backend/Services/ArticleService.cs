@@ -285,7 +285,9 @@ public class ArticleService : IArticleService
             SeoTitle = request.SeoTitle,
             SeoDescription = request.SeoDescription,
             SeoKeywords = request.SeoKeywords,
-            PublishedAt = request.Status == "published" ? now : null
+            PublishedAt = request.PublishedAt ?? (request.Status == "published" ? now : null),
+            CreatedAt = request.CreatedAt ?? now,
+            UpdatedAt = request.UpdatedAt ?? now,
         };
 
         _db.Articles.Add(article);

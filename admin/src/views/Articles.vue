@@ -21,6 +21,9 @@ import { getTagListApi } from '@/api/tag'
 
 const router = useRouter()
 
+/** 前台站点 URL */
+const siteUrl = import.meta.env.VITE_SITE_URL || 'http://localhost:3000'
+
 /** 加载状态 */
 const loading = ref(false)
 
@@ -543,7 +546,14 @@ onMounted(() => {
             <div class="title-cell">
               <el-tag v-if="row.isTop" size="small" type="warning" class="top-tag">置顶</el-tag>
               <el-tag v-if="row.isRecommend" size="small" type="danger" class="recommend-tag">推荐</el-tag>
-              <span class="title-text">{{ row.title }}</span>
+              <a
+                v-if="row.status === 'published'"
+                :href="`${siteUrl}/articles/${row.slug}`"
+                target="_blank"
+                class="title-link"
+                :title="`前台浏览：${row.title}`"
+              >{{ row.title }}</a>
+              <span v-else class="title-text">{{ row.title }}</span>
             </div>
           </template>
         </el-table-column>
@@ -717,6 +727,17 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.title-link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #409eff;
+  text-decoration: none;
+}
+.title-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
 }
 .stats {
   font-size: 13px;
