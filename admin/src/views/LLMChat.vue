@@ -2,6 +2,7 @@
 import { ref, nextTick, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getLlmConfigApi, llmChatApi } from '@/api/llm'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
 interface Message {
   role: 'user' | 'assistant'
