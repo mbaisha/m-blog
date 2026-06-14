@@ -68,14 +68,12 @@ public class ArticleService : IArticleService
 {
     private readonly AppDbContext _db;
     private readonly IMemoryCache _cache;
-    private readonly FrontendRevalidateService _frontendRevalidate;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
-    public ArticleService(AppDbContext db, IMemoryCache cache, FrontendRevalidateService frontendRevalidate)
+    public ArticleService(AppDbContext db, IMemoryCache cache)
     {
         _db = db;
         _cache = cache;
-        _frontendRevalidate = frontendRevalidate;
     }
 
     public async Task<PagedResponse<ArticleListItem>> GetPagedAsync(ArticleQueryParams query)
@@ -322,20 +320,8 @@ public class ArticleService : IArticleService
 
         await _db.SaveChangesAsync();
 
-        var created = await GetByIdAsync(article.Id)
+        return await GetByIdAsync(article.Id)
             ?? throw new InvalidOperationException("创建文章后获取详情失败");
-
-        // 通知 Next.js 失效列表/详情缓存（仅已发布/新创建时）
-        if (article.Status == "published")
-        {
-            await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
-        }
-        else
-        {
-            await _frontendRevalidate.RevalidateAsync(tags: new[] { "articles-list" });
-        }
-
-        return created;
     }
 
     public async Task<ArticleDetailResponse?> UpdateAsync(Guid id, UpdateArticleRequest request)
@@ -424,12 +410,7 @@ public class ArticleService : IArticleService
         }
 
         await _db.SaveChangesAsync();
-        var updated = await GetByIdAsync(id);
-
-        // 仅作列表层失效（详情 tag 在 UpdateAsync 主流程里已经覆盖过；这里避免重复）
-        await _frontendRevalidate.RevalidateAsync(tags: new[] { "articles-list" });
-
-        return updated;
+        return await GetByIdAsync(id);
     }
 
     public async Task<ArticleDetailResponse?> UpdateStatusAsync(Guid id, string status)
@@ -451,12 +432,7 @@ public class ArticleService : IArticleService
         }
 
         await _db.SaveChangesAsync();
-        var detail = await GetByIdAsync(id);
-
-        // 状态变化会同时影响详情（status 判断 + 已发布过滤），所以两个 tag 都失效
-        await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
-
-        return detail;
+        return await GetByIdAsync(id);
     }
 
     public async Task<bool> ToggleTopAsync(Guid id)
@@ -466,7 +442,6 @@ public class ArticleService : IArticleService
 
         article.IsTop = !article.IsTop;
         await _db.SaveChangesAsync();
-        await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
         return true;
     }
 
@@ -477,7 +452,6 @@ public class ArticleService : IArticleService
 
         article.IsRecommend = !article.IsRecommend;
         await _db.SaveChangesAsync();
-        await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
         return true;
     }
 
@@ -488,7 +462,6 @@ public class ArticleService : IArticleService
 
         article.DeletedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync();
-        await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
         return true;
     }
 
@@ -508,10 +481,8 @@ public class ArticleService : IArticleService
         if (article.Comments.Any())
             _db.Comments.RemoveRange(article.Comments);
 
-        var slug = article.Slug;
         _db.Articles.Remove(article);
         await _db.SaveChangesAsync();
-        await _frontendRevalidate.RevalidateArticleAsync(slug);
         return true;
     }
 
@@ -525,7 +496,6 @@ public class ArticleService : IArticleService
         article.DeletedAt = null;
         article.UpdatedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync();
-        await _frontendRevalidate.RevalidateArticleAsync(article.Slug);
         return true;
     }
 

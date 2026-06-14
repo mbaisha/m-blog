@@ -27,6 +27,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: mblog-api
+    image: docker.cnb.cool/vxera/m-blog/api:latest
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -61,6 +62,7 @@ services:
         NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
         NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
     container_name: mblog-frontend
+    image: docker.cnb.cool/vxera/m-blog/frontend:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -71,8 +73,6 @@ services:
       NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
       # 服务端渲染时通过 Docker 内部网络直连后端
       INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
-      # 文章变更后接收后端的缓存失效请求
-      REVALIDATE_SECRET: ${FRONTEND_REVALIDATE_SECRET:-dev-frontend-revalidate-secret-change-me}
     depends_on:
       - api
 
@@ -86,6 +86,7 @@ services:
         VITE_SITE_NAME: ${SITE_NAME:-个人博客}后台管理
         VITE_SITE_URL: ${SITE_URL:-http://localhost:3000}
     container_name: mblog-admin
+    image: docker.cnb.cool/vxera/m-blog/admin:latest
     restart: unless-stopped
     ports:
       - "5173:80"

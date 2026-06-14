@@ -158,7 +158,6 @@ builder.Services.AddScoped<ILlmService, LlmService>();
 builder.Services.AddScoped<IImageGenService, ImageGenService>();
 builder.Services.AddScoped<IArticleAiService, ArticleAiService>();
     builder.Services.AddScoped<ImportService>();
-    builder.Services.AddHttpClient<FrontendRevalidateService>();
     builder.Services.AddHostedService<VisitCleanupJob>();
     builder.Services.AddHostedService<WeeklyDigestJob>();
     builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection(StorageSettings.SectionName));

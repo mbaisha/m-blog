@@ -3,7 +3,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { apiClient, fetchSeoSettings, fetchPageLayout } from "@/lib/api"
 import type { ApiResponse, PublicProjectListItem, PublicModuleLayout } from "@/types"
-import { coverImageUrlWithVersion } from "@/lib/imageVersion"
 import VisitTracker from "@/components/VisitTracker"
 import LayoutUniversalModules from "@/components/LayoutUniversalModules"
 
@@ -94,7 +93,7 @@ export default async function ProjectsPage() {
                 }}
               >
                 {project.coverImageUrl ? (
-                  <Image src={coverImageUrlWithVersion(project.coverImageUrl, project.createdAt)} alt={project.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" />
+                  <Image src={project.coverImageUrl} alt={project.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-4xl font-bold" style={{ color: 'var(--color-primary)', opacity: 0.2 }}>

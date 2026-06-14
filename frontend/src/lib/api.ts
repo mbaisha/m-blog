@@ -19,24 +19,17 @@ class ApiClient {
     this.baseUrl = baseUrl
   }
 
-  private async request<T>(endpoint: string, options?: RequestInit & { tags?: string[]; revalidate?: number | false }): Promise<T> {
+  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options?.headers,
     }
 
-    // 将自定义 tags / revalidate 透传给 Next.js fetch
-    const { tags, revalidate, ...rest } = options as RequestInit & { tags?: string[]; revalidate?: number | false }
-    const nextOptions: { tags?: string[]; revalidate?: number | false } = {}
-    if (tags && tags.length > 0) nextOptions.tags = tags
-    if (revalidate !== undefined) nextOptions.revalidate = revalidate
-
     const response = await fetch(url, {
-      ...rest,
+      ...options,
       headers,
-      ...(Object.keys(nextOptions).length > 0 ? { next: nextOptions } : {}),
-      cache: tags || revalidate !== undefined ? undefined : 'no-store',
+      cache: 'no-store',
     })
 
     if (!response.ok) {
@@ -48,11 +41,7 @@ class ApiClient {
   }
 
   /** GET 请求 */
-  async get<T>(
-    endpoint: string,
-    params?: Record<string, string | number | undefined>,
-    options?: RequestInit & { tags?: string[]; revalidate?: number | false }
-  ): Promise<T> {
+  async get<T>(endpoint: string, params?: Record<string, string | number | undefined>): Promise<T> {
     let url = endpoint
     if (params) {
       const searchParams = new URLSearchParams()
@@ -64,7 +53,7 @@ class ApiClient {
       const query = searchParams.toString()
       if (query) url += `?${query}`
     }
-    return this.request<T>(url, options)
+    return this.request<T>(url)
   }
 
   /** POST 请求 */

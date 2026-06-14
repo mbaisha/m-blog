@@ -7,7 +7,6 @@ import Image from 'next/image'
 import type { PublicArticleListItem, PublicCategoryInfo, PublicTagInfo, PublicModuleLayout } from '@/types'
 import LayoutUniversalModules from '@/components/LayoutUniversalModules'
 import ArticleCard from '@/components/ArticleCard'
-import { coverImageUrlWithVersion } from '@/lib/imageVersion'
 
 // ===== Types =====
 
@@ -481,7 +480,7 @@ export default function ArticlesPageContent({
                             </span>
                           )}
                           {article.coverImageUrl ? (
-                            <Image src={coverImageUrlWithVersion(article.coverImageUrl, article.updatedAt)} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" />
+                            <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" />
                           ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-[24px] font-bold">
                               <span>{getFirstValidChar(article.title)}</span>
@@ -589,7 +588,7 @@ export default function ArticlesPageContent({
                             </span>
                           )}
                           {article.coverImageUrl ? (
-                            <Image src={coverImageUrlWithVersion(article.coverImageUrl, article.updatedAt)} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" />
+                            <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" />
                           ) : (
                             <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>
                           )}
