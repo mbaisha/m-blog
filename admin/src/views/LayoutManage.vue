@@ -176,6 +176,11 @@ function buildAllModuleOptions(): Record<string, ModuleDef[]> {
         { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的置顶文章数' },
         { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
       ]},
+      { key: 'hot_posts', label: '热门文章', icon: 'HotWater', color: '#ef4444', desc: '热门文章卡片/列表展示（按阅读量倒序）', configFields: [
+        { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
+        { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的热门文章数' },
+        { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
+      ]},
       { key: 'featured_posts', label: '精选文章', icon: 'StarFilled', color: '#f59e0b', desc: '推荐文章展示', configFields: [
         { key: 'count', label: '文章数量', type: 'number', default: 3, placeholder: '3', tip: '显示的精选文章数量' },
         { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
@@ -201,6 +206,11 @@ function buildAllModuleOptions(): Record<string, ModuleDef[]> {
       { key: 'pinned_posts', label: '置顶文章', icon: 'Top', color: '#f59e0b', desc: '置顶文章卡片/列表展示', configFields: [
         { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
         { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的置顶文章数' },
+        { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
+      ]},
+      { key: 'hot_posts', label: '热门文章', icon: 'HotWater', color: '#ef4444', desc: '热门文章卡片/列表展示（按阅读量倒序）', configFields: [
+        { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
+        { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的热门文章数' },
         { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
       ]},
       { key: 'search_bar', label: '搜索筛选条', icon: 'Search', color: '#06b6d4', desc: '搜索框、分类下拉、排序、视图切换', configFields: [] },
@@ -251,6 +261,11 @@ function buildAllModuleOptions(): Record<string, ModuleDef[]> {
       { key: 'pinned_posts', label: '置顶文章', icon: 'Top', color: '#f59e0b', desc: '置顶文章卡片/列表展示', configFields: [
         { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
         { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的置顶文章数' },
+        { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
+      ]},
+      { key: 'hot_posts', label: '热门文章', icon: 'HotWater', color: '#ef4444', desc: '热门文章卡片/列表展示（按阅读量倒序）', configFields: [
+        { key: 'displayStyle', label: '显示样式', type: 'radio', default: 'card', options: [{ label: '卡片', value: 'card' }, { label: '列表', value: 'list' }] },
+        { key: 'count', label: '显示数量', type: 'number', default: 5, placeholder: '5', tip: '最多显示的热门文章数' },
         { key: 'columns', label: '列数（卡片模式）', type: 'number', default: 3, placeholder: '3', min: 2, max: 4, tip: '卡片排列列数，最小2列，最大4列' },
       ]},
       { key: 'article_list', label: '文章列表', icon: 'List', color: '#10b981', desc: '分类下文章列表', configFields: [

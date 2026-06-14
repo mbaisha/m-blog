@@ -85,6 +85,7 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
 interface HomeContentProps {
   articles: PublicArticleListItem[]
   recommended: PublicArticleListItem[]
+  hotPosts: PublicArticleListItem[]
   latest: PublicArticleListItem[]
   projects: PublicProjectListItem[]
   categories: PublicCategoryInfo[]
@@ -97,7 +98,7 @@ interface HomeContentProps {
 // ---- Component ----
 
 export default function HomeContent(props: HomeContentProps) {
-  const { articles, recommended, latest, projects, tags, totalArticles, siteSettings, layoutModules } = props
+  const { articles, recommended, hotPosts, latest, projects, tags, totalArticles, siteSettings, layoutModules } = props
   const totalViews = articles.reduce((sum, a) => sum + (a.viewCount || 0), 0)
   const siteName = siteSettings?.siteName || "Zhu's Blog"
   const logoUrl = siteSettings?.logoImageUrl
@@ -306,6 +307,101 @@ export default function HomeContent(props: HomeContentProps) {
     )
   }
 
+  // ===== 文章列表渲染（卡片/列表双视图，供 pinned_posts / hot_posts 共用）=====
+  function renderArticlePosts(moduleKey: string, title: string, items: PublicArticleListItem[]) {
+    const mod = moduleMap.get(moduleKey)
+    if (!mod || !mod.isEnabled) return null
+    const cfg = (() => { try { return JSON.parse(mod.config || '{}') } catch { return {} } })()
+    const displayStyle = cfg.displayStyle || 'card'
+    const count = cfg.count || 5
+    const columns = Math.min(Math.max(cfg.columns || 3, 2), 4)
+    const slice = items.slice(0, count)
+    if (slice.length === 0) return null
+    const badgeLabel = title === '置顶文章' ? '置顶' : '热门'
+    return (
+      <ScrollReveal key={moduleKey}>
+        <section className="mt-8">
+          <SectionHeader title={title} href="/articles" />
+          {displayStyle === 'card' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+              {slice.map((article) => {
+                const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
+                const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors['其他']
+                return (
+                  <Link key={article.id} href={`/articles/${article.slug}`} className="flex flex-col rounded-[12px] overflow-hidden transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
+                    <div className="relative w-full overflow-hidden bg-[#F3F4F6]" style={{ aspectRatio: '16/9' }}>
+                      {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" /> : null}
+                      {cats.length > 0 && (
+                        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                          {cats.map((cat) => <span key={cat.id} className="px-2 py-0.5 rounded-[4px] text-[8px] font-medium" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: catBrand.text }}>{cat.name}</span>)}
+                        </div>
+                      )}
+                      <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-[4px] text-[9px] font-medium shadow-sm" style={{ backgroundColor: title === '置顶文章' ? '#f97316' : '#ef4444', color: '#fff' }}>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M16 12h-2V6h2l4-4-4-4h-2V2h-2V0h-2v2H8V0H6L2 4l4 4h2v6H6v2l6 6 6-6z" transform="rotate(45 12 12)" /></svg>
+                        {badgeLabel}
+                      </div>
+                    </div>
+                    <div className="p-3 flex flex-col gap-1.5 flex-1">
+                      <h3 className="text-[13px] font-medium leading-snug line-clamp-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{article.title}</h3>
+                      <div className="flex items-center gap-2 text-[10px]" style={{ color: 'var(--color-text-tertiary, #9CA3AF)' }}>
+                        {article.publishedAt && <time>{new Date(article.publishedAt).toLocaleDateString('zh-CN')}</time>}
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                          {article.viewCount || 0}
+                        </span>
+                        <span>·</span>
+                        <span>5 分钟</span>
+                      </div>
+                      {article.tags && article.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-auto pt-1">
+                          {article.tags.slice(0, 3).map((tag: any) => <span key={tag.id} className="px-1.5 py-0.5 rounded-[3px] text-[7px]" style={{ backgroundColor: tag.bgColor || 'var(--color-border-light)', color: tag.color || autoTextColor(tag.bgColor) }}>{tag.name}</span>)}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {slice.map((article) => {
+                const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
+                const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors['其他']
+                return (
+                  <Link key={article.id} href={`/articles/${article.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
+                    <div className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[20px] font-bold" style={{ backgroundColor: article.coverImageUrl ? 'var(--color-border-light, #F3F4F6)' : catBrand.bg || '#EEEDFE', color: catBrand.text || '#534AB7' }}>
+                      {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[14px] font-medium leading-snug truncate" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                        <span className="inline-flex items-center mr-1 px-1 py-0.5 rounded-[3px] text-[9px] font-medium text-white align-middle" style={{ backgroundColor: title === '置顶文章' ? '#f97316' : '#ef4444' }}>{badgeLabel}</span>
+                        {article.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 text-[11px] flex-wrap" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
+                        {cats.map((cat, idx) => (<span key={cat.id}>{idx > 0 && <span className="mr-1">·</span>}<span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-medium" style={{ backgroundColor: getCategoryBrand(cat.name).bg, color: getCategoryBrand(cat.name).text }}>{cat.name}</span></span>))}
+                        {article.publishedAt && <><span>·</span><time>{new Date(article.publishedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}</time></>}
+                        <span>·</span>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                          {article.viewCount || 0}
+                        </span><span>·</span><span>5 分钟</span>
+                      </div>
+                    </div>
+                    {article.tags && article.tags.length > 0 && (
+                      <div className="hidden sm:flex flex-wrap gap-1.5 flex-shrink-0 max-w-[140px]">
+                        {article.tags.slice(0, 2).map((tag: any) => <span key={tag.id} className="px-2 py-0.5 rounded-[5px] text-[9px] font-medium whitespace-nowrap" style={{ backgroundColor: tag.bgColor || 'var(--color-border-light)', color: tag.color || autoTextColor(tag.bgColor) }}>{tag.name}</span>)}
+                      </div>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </section>
+      </ScrollReveal>
+    )
+  }
+
   // 页面特有模块渲染表
   const moduleRenderers: Record<string, () => React.ReactNode> = {
     hero: () => (
@@ -318,98 +414,9 @@ export default function HomeContent(props: HomeContentProps) {
       />
     ),
 
-    pinned_posts: () => {
-      const mod = moduleMap.get('pinned_posts')
-      if (!mod || !mod.isEnabled) return null
-      const cfg = (() => { try { return JSON.parse(mod.config || '{}') } catch { return {} } })()
-      const displayStyle = cfg.displayStyle || 'card'
-      const count = cfg.count || 5
-      const columns = Math.min(Math.max(cfg.columns || 3, 2), 4)
-      const pinnedArticles = articles.filter(a => a.isTop).slice(0, count)
-      if (pinnedArticles.length === 0) return null
-      return (
-        <ScrollReveal key="pinned_posts">
-          <section className="mt-8">
-            <SectionHeader title="置顶文章" href="/articles" />
-            {displayStyle === 'card' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
-                {pinnedArticles.map((article) => {
-                  const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
-                  const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors['其他']
-                  return (
-                    <Link key={article.id} href={`/articles/${article.slug}`} className="flex flex-col rounded-[12px] overflow-hidden transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
-                      <div className="relative w-full overflow-hidden bg-[#F3F4F6]" style={{ aspectRatio: '16/9' }}>
-                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" /> : null}
-                        {cats.length > 0 && (
-                          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                            {cats.map((cat) => <span key={cat.id} className="px-2 py-0.5 rounded-[4px] text-[8px] font-medium" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: catBrand.text }}>{cat.name}</span>)}
-                          </div>
-                        )}
-                        <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-[4px] text-[9px] font-medium bg-orange-500 text-white shadow-sm">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M16 12h-2V6h2l4-4-4-4h-2V2h-2V0h-2v2H8V0H6L2 4l4 4h2v6H6v2l6 6 6-6z" transform="rotate(45 12 12)" /></svg>
-                          置顶
-                        </div>
-                      </div>
-                      <div className="p-3 flex flex-col gap-1.5 flex-1">
-                        <h3 className="text-[13px] font-medium leading-snug line-clamp-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{article.title}</h3>
-                        <div className="flex items-center gap-2 text-[10px]" style={{ color: 'var(--color-text-tertiary, #9CA3AF)' }}>
-                          {article.publishedAt && <time>{new Date(article.publishedAt).toLocaleDateString('zh-CN')}</time>}
-                          <span className="flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            {article.viewCount || 0}
-                          </span>
-                          <span>·</span>
-                          <span>5 分钟</span>
-                        </div>
-                        {article.tags && article.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-auto pt-1">
-                            {article.tags.slice(0, 3).map((tag: any) => <span key={tag.id} className="px-1.5 py-0.5 rounded-[3px] text-[7px]" style={{ backgroundColor: tag.bgColor || 'var(--color-border-light)', color: tag.color || autoTextColor(tag.bgColor) }}>{tag.name}</span>)}
-                          </div>
-                        )}
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {pinnedArticles.map((article) => {
-                  const cats = article.categories?.length > 0 ? article.categories : (article.category ? [article.category] : [])
-                  const catBrand = cats.length > 0 ? getCategoryBrand(cats[0].name) : categoryBrandColors['其他']
-                  return (
-                    <Link key={article.id} href={`/articles/${article.slug}`} className="flex items-center gap-3 rounded-[10px] p-3 transition-all hover:-translate-y-0.5" style={{ border: '0.5px solid var(--color-border, #E5E7EB)', backgroundColor: 'var(--card-bg, #fff)', boxShadow: 'var(--card-shadow, none)' }}>
-                      <div className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 relative overflow-hidden flex items-center justify-center text-[20px] font-bold" style={{ backgroundColor: article.coverImageUrl ? 'var(--color-border-light, #F3F4F6)' : catBrand.bg || '#EEEDFE', color: catBrand.text || '#534AB7' }}>
-                        {article.coverImageUrl ? <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" /> : <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-[14px] font-medium leading-snug truncate" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
-                          <span className="inline-flex items-center mr-1 px-1 py-0.5 rounded-[3px] text-[9px] font-medium bg-orange-500 text-white align-middle">置顶</span>
-                          {article.title}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1 text-[11px] flex-wrap" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
-                          {cats.map((cat, idx) => (<span key={cat.id}>{idx > 0 && <span className="mr-1">·</span>}<span className="px-1.5 py-0.5 rounded-[3px] text-[10px] font-medium" style={{ backgroundColor: getCategoryBrand(cat.name).bg, color: getCategoryBrand(cat.name).text }}>{cat.name}</span></span>))}
-                          {article.publishedAt && <><span>·</span><time>{new Date(article.publishedAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}</time></>}
-                          <span>·</span>
-                          <span className="flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            {article.viewCount || 0}
-                          </span><span>·</span><span>5 分钟</span>
-                        </div>
-                      </div>
-                      {article.tags && article.tags.length > 0 && (
-                        <div className="hidden sm:flex flex-wrap gap-1.5 flex-shrink-0 max-w-[140px]">
-                          {article.tags.slice(0, 2).map((tag: any) => <span key={tag.id} className="px-2 py-0.5 rounded-[5px] text-[9px] font-medium whitespace-nowrap" style={{ backgroundColor: tag.bgColor || 'var(--color-border-light)', color: tag.color || autoTextColor(tag.bgColor) }}>{tag.name}</span>)}
-                        </div>
-                      )}
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
-          </section>
-        </ScrollReveal>
-      )
-    },
+    pinned_posts: () => renderArticlePosts('pinned_posts', '置顶文章', articles.filter(a => a.isTop)),
+
+    hot_posts: () => renderArticlePosts('hot_posts', '热门文章', hotPosts),
 
     hot_tags: () => {
       if (tags.length === 0) return null

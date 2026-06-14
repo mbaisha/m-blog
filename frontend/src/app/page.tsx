@@ -68,6 +68,11 @@ async function getHomeData() {
     })
     const latest = sortedByPublishedAt.slice(0, rpCount)
 
+    // 热门文章 — 按阅读量倒序
+    const hpCount = getCount('hot_posts', 5)
+    const sortedByViews = [...allArticles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+    const hotPosts = sortedByViews.slice(0, hpCount)
+
     // 项目展示 — 按配置动态截取
     const projCount = getCount('projects', 4)
     const projects = (projectsRes.data || []).slice(0, projCount)
@@ -75,6 +80,7 @@ async function getHomeData() {
     return {
       articles: allArticles,
       recommended,
+      hotPosts,
       latest,
       projects,
       categories: categoriesRes.data || [],
@@ -84,7 +90,7 @@ async function getHomeData() {
       layoutModules,
     }
   } catch {
-    return { articles: [], recommended: [], latest: [], projects: [], categories: [], tags: [], totalArticles: 0, siteSettings: null, layoutModules: [] }
+    return { articles: [], recommended: [], hotPosts: [], latest: [], projects: [], categories: [], tags: [], totalArticles: 0, siteSettings: null, layoutModules: [] }
   }
 }
 

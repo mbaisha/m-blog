@@ -425,6 +425,42 @@ export default function ArticlesPageContent({
             </div>
           )}
 
+          {/* ===== Hot Posts Module ===== */}
+          {isEnabled('hot_posts') && !loading && (
+            <div className="mb-6">
+              {(() => {
+                const mod = moduleMap.get('hot_posts')
+                if (!mod || !mod.isEnabled) return null
+                const cfg = (() => { try { return JSON.parse(mod?.config || '{}') } catch { return {} } })()
+                const displayStyle = cfg.displayStyle || 'card'
+                const count = cfg.count || 5
+                const columns = Math.min(Math.max(cfg.columns || 3, 2), 4)
+                const hot = [...articles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, count)
+                if (hot.length === 0) return null
+                return (
+                  <section>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-[16px] font-medium" style={{ color: 'var(--color-text-primary)' }}>热门文章</h2>
+                    </div>
+                    {displayStyle === 'card' ? (
+                      <div className="grid gap-4 article-grid-responsive" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+                        {hot.map(article => (
+                          <ArticleCard key={article.id} article={article} viewMode="card" showCategories={true} showTags={true} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {hot.map(article => (
+                          <ArticleCard key={article.id} article={article} viewMode="list" showCategories={true} showTags={true} />
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                )
+              })()}
+            </div>
+          )}
+
           {/* ===== Articles Grid / List ===== */}
           {isEnabled('article_list') && loading && (
             <div
