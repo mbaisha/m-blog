@@ -1,5 +1,19 @@
 version: "3.9"
 
+# ============================================================================
+# MBlog docker-compose 配置
+#
+# 变量优先级（从高到低）：
+#   1. 下方 services.<service>.environment 中**未注释**的变量（覆盖 .env）
+#   2. .env 文件（被 env_file 自动加载）
+#   3. .env.example 中的默认值
+#
+# 使用方式：
+#   - 默认：通过 .env 配置所有变量（推荐）
+#   - 想用 docker-compose.yml 覆盖某个变量：去掉对应行的 # 注释
+#   - 想新增 .env.example 中没有的变量：取消注释对应行并赋值
+# ============================================================================
+
 services:
   # ===== 数据库 =====
   postgres:
@@ -9,9 +23,15 @@ services:
     ports:
       - "5432:5432"
     environment:
+      # ---------- 基础 ----------
       POSTGRES_DB: mblog
       POSTGRES_USER: mblog_user
       POSTGRES_PASSWORD: ${DB_PASSWORD:-mblog_pass}
+
+      # ---------- 可选覆盖（默认从 .env 读取，注释掉则走默认值） ----------
+      # POSTGRES_DB: ${POSTGRES_DB:-mblog}
+      # POSTGRES_USER: ${POSTGRES_USER:-mblog_user}
+      # POSTGRES_PASSWORD: ${DB_PASSWORD:-mblog_pass}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./deploy/backup:/backup  # 备份目录映射
@@ -32,16 +52,33 @@ services:
     ports:
       - "5000:5000"
     env_file:
-      - .env   # 加载 DB_PASSWORD / JWT_KEY / SITE_URL 等
+      - .env   # 加载 DB_PASSWORD / JWT_KEY / SITE_URL / JWT_ISSUER / JWT_AUDIENCE 等
     environment:
+      # ---------- 运行时配置（ASP.NET Core） ----------
       ASPNETCORE_URLS: "http://+:5000"
       ASPNETCORE_ENVIRONMENT: Production
+
+      # ---------- 数据库连接（容器内置 PG） ----------
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: mblog
       DB_USER: mblog_user
+
+      # ---------- 站点 / 邮件 ----------
       # 订阅/邮件中的站点链接（也来自 .env 中的 SITE_URL）
       PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
+
+      # ---------- 可选覆盖（默认从 .env 读取，注释掉则走 env_file / 默认值） ----------
+      # DB_HOST: ${DB_HOST:-postgres}
+      # DB_PORT: ${DB_PORT:-5432}
+      # DB_NAME: ${DB_NAME:-mblog}
+      # DB_USER: ${DB_USER:-mblog_user}
+      # DB_PASSWORD: ${DB_PASSWORD:-mblog_pass}
+      # JWT 映射到 appsettings.json 的 Jwt:Key（覆盖默认值）
+      # Jwt__Key: ${JWT_KEY:-your-super-secret-key-at-least-32-characters}
+      # Jwt__Issuer: ${JWT_ISSUER:-mblog-api}
+      # Jwt__Audience: ${JWT_AUDIENCE:-mblog-client}
+      # PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
     volumes:
       - uploads_data:/app/uploads  # 持久化上传文件
       - logs_data:/app/logs        # 持久化日志
@@ -65,11 +102,17 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env   # 加载项目根目录 .env，自动获得 SITE_URL / API_BASE_URL / SITE_NAME / INTERNAL_API_BASE_URL
+      - .env   # 加载 SITE_URL / API_BASE_URL / SITE_NAME / INTERNAL_API_BASE_URL
     environment:
       NODE_ENV: production
       # 服务端渲染时直连后端的内部地址（默认走 Docker 网络）
       INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
+
+      # ---------- 可选覆盖（默认从 .env 读取，注释掉则走 env_file / 默认值） ----------
+      # SITE_URL: ${SITE_URL:-http://localhost}
+      # API_BASE_URL: ${API_BASE_URL:-/api}
+      # SITE_NAME: ${SITE_NAME:-个人博客}
+      # INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
     volumes:
       - uploads_data:/app/public/uploads  # 持久化上传文件
     depends_on:
@@ -88,6 +131,11 @@ services:
       - "5173:80"
     env_file:
       - .env   # 加载 SITE_URL / API_BASE_URL / SITE_NAME，entrypoint.sh 会注入到 config.js
+    # environment:        # 留空占位：admin 运行时配置全部由 entrypoint.sh 读取并注入
+      # ---------- 可选覆盖（默认从 .env 读取，entrypoint.sh 注入到 config.js） ----------
+      # VITE_SITE_URL: ${SITE_URL:-http://localhost:3000}
+      # VITE_API_BASE_URL: ${API_BASE_URL:-/api}
+      # VITE_SITE_NAME: ${SITE_NAME:-个人博客后台管理}
 
   # ===== Nginx 反向代理 =====
   nginx:
