@@ -4,6 +4,9 @@ import { fetchPageBySlug, fetchPublishedPages } from '@/lib/api'
 import type { PublicPageItem } from '@/types'
 import VisitTracker from '@/components/VisitTracker'
 
+/** 页面缓存时间（秒），60 秒后重新验证 */
+export const revalidate = 60
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }

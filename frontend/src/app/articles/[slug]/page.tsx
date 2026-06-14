@@ -13,6 +13,9 @@ import MarkdownContent from "./MarkdownContent"
 import CommentList from "@/components/CommentList"
 import VisitTracker from "@/components/VisitTracker"
 
+/** 页面缓存时间（秒），60 秒后重新验证 */
+export const revalidate = 60
+
 interface Props {
   params: Promise<{ slug: string }>
 }
@@ -69,6 +72,14 @@ function autoTextColor(bgColor?: string | null): string {
   const b = parseInt(hex.substring(4, 6), 16)
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return luminance > 0.6 ? '#1F2937' : '#FFFFFF'
+}
+
+/** 封面图片 URL 加上版本参数，更换封面后缓存自动失效 */
+function coverUrlWithVersion(url: string, updatedAt?: string): string {
+  if (!updatedAt) return url
+  const ts = new Date(updatedAt).getTime()
+  const sep = url.includes('?') ? '&' : '?'
+  return `${url}${sep}v=${ts}`
 }
 
 export default async function ArticleDetailPage({ params }: Props) {
@@ -238,11 +249,11 @@ export default async function ArticleDetailPage({ params }: Props) {
 
           </div>
 
-          {/* Cover image (optional) */}
+          {/* Cover image (optional) — 带版本参数避免缓存 */}
           {article.coverImageUrl && (
             <div className="flex-shrink-0 w-full md:w-[360px] rounded-2xl overflow-hidden relative aspect-video">
               <Image
-                src={article.coverImageUrl}
+                src={coverUrlWithVersion(article.coverImageUrl, article.updatedAt)}
                 alt={article.title}
                 fill
                 className="object-cover"
