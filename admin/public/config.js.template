@@ -2,12 +2,12 @@
  * 运行时配置 - 模板文件
  *
  * 容器启动时由 entrypoint.sh 通过 envsubst 替换占位符，输出到 config.js。
- * 占位符：__VITE_API_BASE_URL__  __VITE_SITE_URL__  __VITE_SITE_NAME__
+ * 占位符格式：${VITE_API_BASE_URL} ${VITE_SITE_URL} ${VITE_SITE_NAME}
  *
  * 不要在此处直接修改具体配置，请通过 .env 或 docker-compose.yml 注入环境变量。
  */
 window.__APP_CONFIG__ = {
-  VITE_API_BASE_URL: '__VITE_API_BASE_URL__',
-  VITE_SITE_URL: '__VITE_SITE_URL__',
-  VITE_SITE_NAME: '__VITE_SITE_NAME__'
+  VITE_API_BASE_URL: '${VITE_API_BASE_URL}',
+  VITE_SITE_URL: '${VITE_SITE_URL}',
+  VITE_SITE_NAME: '${VITE_SITE_NAME}'
 };
