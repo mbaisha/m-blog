@@ -4,6 +4,7 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { apiClient, fetchPageLayout } from "@/lib/api"
 import type { ApiResponse, PublicProjectDetail, PublicModuleLayout } from "@/types"
+import { coverImageUrlWithVersion } from "@/lib/imageVersion"
 import VisitTracker from "@/components/VisitTracker"
 import MarkdownContent from "../../articles/[slug]/MarkdownContent"
 
@@ -170,7 +171,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* cover */}
       {isEnabled('cover') && project.coverImageUrl && (
         <div className="aspect-video rounded-[16px] overflow-hidden mb-8 flex justify-center bg-[#F3F4F6] relative">
-          <Image src={project.coverImageUrl} alt={project.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, 720px" priority />
+          <Image src={coverImageUrlWithVersion(project.coverImageUrl, project.updatedAt)} alt={project.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, 720px" priority />
         </div>
       )}
 

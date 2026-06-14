@@ -71,6 +71,8 @@ services:
       NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
       # 服务端渲染时通过 Docker 内部网络直连后端
       INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
+      # 文章变更后接收后端的缓存失效请求
+      REVALIDATE_SECRET: ${FRONTEND_REVALIDATE_SECRET:-dev-frontend-revalidate-secret-change-me}
     depends_on:
       - api
 

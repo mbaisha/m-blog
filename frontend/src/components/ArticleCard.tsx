@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { PublicArticleListItem } from '@/types'
+import { coverImageUrlWithVersion } from '@/lib/imageVersion'
 
 // ===== Brand colors =====
 const categoryBrandColors: Record<string, { bg: string; text: string; border: string; coverBg: string }> = {
@@ -70,7 +71,7 @@ export default function ArticleCard({
           }}
         >
           {article.coverImageUrl ? (
-            <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" />
+            <Image src={coverImageUrlWithVersion(article.coverImageUrl, article.updatedAt)} alt={article.title} fill className="object-cover" sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" loading="lazy" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-[24px] font-bold">
               <span>{getFirstValidChar(article.title)}</span>
@@ -169,7 +170,7 @@ export default function ArticleCard({
         }}
       >
         {article.coverImageUrl ? (
-          <Image src={article.coverImageUrl} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" />
+          <Image src={coverImageUrlWithVersion(article.coverImageUrl, article.updatedAt)} alt={article.title} fill className="object-cover" sizes="56px" loading="lazy" />
         ) : (
           <span className="text-[24px] font-bold block">{getFirstValidChar(article.title)}</span>
         )}

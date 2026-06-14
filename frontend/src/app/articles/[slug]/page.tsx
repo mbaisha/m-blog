@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { apiClient, getSiteConfig } from "@/lib/api"
 import type { ApiResponse, PublicArticleDetail, PublicArticleListItem, PublicCategoryInfo, PublicModuleLayout } from "@/types"
 import { fetchPageLayout } from "@/lib/api"
+import { coverImageUrlWithVersion } from "@/lib/imageVersion"
 import { extractHeadings } from "@/lib/headings"
 import ReadingProgress from "@/components/ReadingProgress"
 import FloatingToc from "@/components/FloatingToc"
@@ -12,9 +13,6 @@ import ShareTools from "@/components/ShareTools"
 import MarkdownContent from "./MarkdownContent"
 import CommentList from "@/components/CommentList"
 import VisitTracker from "@/components/VisitTracker"
-
-/** 页面缓存时间（秒），60 秒后重新验证 */
-export const revalidate = 60
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -74,14 +72,6 @@ function autoTextColor(bgColor?: string | null): string {
   return luminance > 0.6 ? '#1F2937' : '#FFFFFF'
 }
 
-/** 封面图片 URL 加上版本参数，更换封面后缓存自动失效 */
-function coverUrlWithVersion(url: string, updatedAt?: string): string {
-  if (!updatedAt) return url
-  const ts = new Date(updatedAt).getTime()
-  const sep = url.includes('?') ? '&' : '?'
-  return `${url}${sep}v=${ts}`
-}
-
 export default async function ArticleDetailPage({ params }: Props) {
   const { slug } = await params
 
@@ -90,7 +80,11 @@ export default async function ArticleDetailPage({ params }: Props) {
   let layoutModules: PublicModuleLayout[] = []
   try {
     const [articleRes, categoriesRes, layoutRes] = await Promise.all([
-      apiClient.get<ApiResponse<PublicArticleDetail>>(`/articles/${slug}`),
+      apiClient.get<ApiResponse<PublicArticleDetail>>(
+        `/articles/${slug}`,
+        undefined,
+        { tags: [`article-${slug}`, 'articles-list'], revalidate: 3600 }
+      ),
       apiClient.get<ApiResponse<PublicCategoryInfo[]>>("/categories").catch(() => null),
       fetchPageLayout("article_detail").catch(() => null),
     ])
@@ -107,9 +101,21 @@ export default async function ArticleDetailPage({ params }: Props) {
   let next: PublicArticleListItem | null = null
   try {
     const [relatedRes, prevRes, nextRes] = await Promise.all([
-      apiClient.get<ApiResponse<PublicArticleListItem[]>>(`/articles/${slug}/related?count=3`).catch(() => null),
-      apiClient.get<ApiResponse<PublicArticleListItem | null>>(`/articles/${slug}/prev`).catch(() => null),
-      apiClient.get<ApiResponse<PublicArticleListItem | null>>(`/articles/${slug}/next`).catch(() => null),
+      apiClient.get<ApiResponse<PublicArticleListItem[]>>(
+        `/articles/${slug}/related?count=3`,
+        undefined,
+        { tags: [`article-${slug}`, 'articles-list'], revalidate: 3600 }
+      ).catch(() => null),
+      apiClient.get<ApiResponse<PublicArticleListItem | null>>(
+        `/articles/${slug}/prev`,
+        undefined,
+        { tags: [`article-${slug}`, 'articles-list'], revalidate: 3600 }
+      ).catch(() => null),
+      apiClient.get<ApiResponse<PublicArticleListItem | null>>(
+        `/articles/${slug}/next`,
+        undefined,
+        { tags: [`article-${slug}`, 'articles-list'], revalidate: 3600 }
+      ).catch(() => null),
     ])
     related = relatedRes?.data || []
     prev = prevRes?.data || null
@@ -249,11 +255,11 @@ export default async function ArticleDetailPage({ params }: Props) {
 
           </div>
 
-          {/* Cover image (optional) — 带版本参数避免缓存 */}
+          {/* Cover image (optional) */}
           {article.coverImageUrl && (
             <div className="flex-shrink-0 w-full md:w-[360px] rounded-2xl overflow-hidden relative aspect-video">
               <Image
-                src={coverUrlWithVersion(article.coverImageUrl, article.updatedAt)}
+                src={coverImageUrlWithVersion(article.coverImageUrl, article.updatedAt)}
                 alt={article.title}
                 fill
                 className="object-cover"
