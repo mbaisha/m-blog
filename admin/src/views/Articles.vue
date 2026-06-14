@@ -18,11 +18,12 @@ import {
 } from '@/api/article'
 import { getCategoryListApi } from '@/api/category'
 import { getTagListApi } from '@/api/tag'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
 const router = useRouter()
 
-/** 前台站点 URL */
-const siteUrl = import.meta.env.VITE_SITE_URL || 'http://localhost:3000'
+/** 前台站点 URL（运行时从环境变量读取，部署时由 .env 注入） */
+const siteUrl = runtimeConfig.SITE_URL
 
 /** 加载状态 */
 const loading = ref(false)

@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5092/api";
+/**
+ * next.config.ts 在构建时执行，rewrites 需要确定的目标地址。
+ * 优先级：
+ *   1. NEXT_PUBLIC_API_BASE_URL  （构建时显式传入，CI/特殊部署场景）
+ *   2. API_BASE_URL              （构建时显式传入）
+ *   3. "http://api:5000/api"     （Docker 网络默认值：前端直连后端容器）
+ *   4. "http://localhost:5092/api" （本地开发默认值）
+ */
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.API_BASE_URL ||
+  (process.env.INTERNAL_API_BASE_URL) ||
+  "http://localhost:5092/api";
 
 const nextConfig: NextConfig = {
   images: {

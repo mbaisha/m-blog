@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig'
 
 interface VisitTrackerProps {
   /** 页面路径，如 /articles/my-post */
@@ -17,7 +18,7 @@ interface VisitTrackerProps {
  */
 export default function VisitTracker({ pagePath, articleId, articleSlug }: VisitTrackerProps) {
   useEffect(() => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'
+    const API_BASE = getClientApiBaseUrl()
 
     fetch(`${API_BASE}/visits/track`, {
       method: 'POST',

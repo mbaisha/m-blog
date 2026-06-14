@@ -1,7 +1,8 @@
 import { apiClient, fetchSiteSettings } from '@/lib/api'
 import type { ApiResponse, PagedData, PublicArticleListItem } from '@/types'
+import { getServerSiteUrl } from '@/lib/runtimeConfig'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const SITE_URL = getServerSiteUrl()
 
 // 将相对路径图片补全为完整 URL
 function toFullUrl(path: string | null | undefined): string | null {

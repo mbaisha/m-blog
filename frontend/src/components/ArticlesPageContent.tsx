@@ -120,7 +120,7 @@ export default function ArticlesPageContent({
     setLoading(true)
     try {
       const queryStr = new URLSearchParams(params).toString()
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'
+      const apiBase = getClientApiBaseUrl()
       const res = await fetch(`${apiBase}/articles?${queryStr}`)
       const data = await res.json()
       if (data.success) {

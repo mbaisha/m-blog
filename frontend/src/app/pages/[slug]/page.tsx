@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { fetchPageBySlug, fetchPublishedPages } from '@/lib/api'
 import type { PublicPageItem } from '@/types'
 import VisitTracker from '@/components/VisitTracker'
+import { getServerSiteUrl } from '@/lib/runtimeConfig'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: page.seoTitle || page.title,
         description: page.seoDescription || page.summary || '',
         type: 'article',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/pages/${slug}`,
+        url: `${getServerSiteUrl()}/pages/${slug}`,
       },
       twitter: {
         card: 'summary_large_image',

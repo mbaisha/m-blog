@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+import { getServerSiteUrl } from '@/lib/runtimeConfig'
+
+const BASE_URL = getServerSiteUrl()
 
 /**
  * 9.2 自动生成 Robots.txt

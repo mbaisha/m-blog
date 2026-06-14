@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
+import { getServerSiteUrl, getServerApiBaseUrl } from '@/lib/runtimeConfig'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const BASE_URL = getServerSiteUrl()
 
 /**
  * 9.1 自动生成 Sitemap
@@ -27,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let pageRoutes: MetadataRoute.Sitemap = []
 
   try {
-    const API_BASE = process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'
+    const API_BASE = getServerApiBaseUrl()
 
     // 5 秒超时，避免构建时因后端未启动而长时间挂起
     const controller = new AbortController()

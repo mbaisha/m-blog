@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: project.title,
         description: project.summary || project.title,
         type: 'article',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/projects/${project.slug}`,
+        url: `${getServerSiteUrl()}/projects/${project.slug}`,
       },
       twitter: {
         card: 'summary_large_image',

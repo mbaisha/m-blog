@@ -6,6 +6,7 @@ import type { ApiResponse, PublicTagInfo, PagedData, PublicArticleListItem, Publ
 import { fetchPageLayout } from "@/lib/api";
 import VisitTracker from "@/components/VisitTracker"
 import ArticleListView from "@/components/ArticleListView"
+import { getServerSiteUrl } from "@/lib/runtimeConfig"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${tag.name} - 标签`,
         description: `${tag.name}标签相关的文章`,
         type: 'website',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/tags/${tag.slug}`,
+        url: `${getServerSiteUrl()}/tags/${tag.slug}`,
       },
       twitter: {
         card: 'summary_large_image',

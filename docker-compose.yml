@@ -31,6 +31,8 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    env_file:
+      - .env   # 加载 DB_PASSWORD / JWT_KEY / SITE_URL 等
     environment:
       ASPNETCORE_URLS: "http://+:5000"
       ASPNETCORE_ENVIRONMENT: Production
@@ -38,12 +40,7 @@ services:
       DB_PORT: 5432
       DB_NAME: mblog
       DB_USER: mblog_user
-      DB_PASSWORD: ${DB_PASSWORD:-mblog_pass}
-      # JWT 配置（Jwt__Key 映射 appsettings.json 的 Jwt:Key）
-      Jwt__Key: ${JWT_KEY:-your-super-secret-key-at-least-32-characters}
-      Jwt__Issuer: ${JWT_ISSUER:-mblog-api}
-      Jwt__Audience: ${JWT_AUDIENCE:-mblog-client}
-      # 订阅/邮件中的站点链接
+      # 订阅/邮件中的站点链接（也来自 .env 中的 SITE_URL）
       PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
     volumes:
       - uploads_data:/app/uploads  # 持久化上传文件
@@ -53,47 +50,44 @@ services:
         condition: service_healthy
 
   # ===== 前台（Next.js） =====
+  # 构建时使用空值占位，运行时由 .env 注入到容器进程；
+  # 客户端再由根 layout.tsx 注入到 window.__APP_CONFIG__。
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
-        NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
-        NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
+        # 仅传给 next.config.ts（构建时），用于服务端 rewrites 目标地址
+        INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
     container_name: mblog-frontend
     image: docker.cnb.cool/vxera/m-blog/frontend:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env   # 加载项目根目录 .env，自动获得 SITE_URL / API_BASE_URL / SITE_NAME / INTERNAL_API_BASE_URL
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
-      NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
-      NEXT_PUBLIC_SITE_NAME: ${SITE_NAME:-个人博客}
-      # 服务端渲染时通过 Docker 内部网络直连后端
+      # 服务端渲染时直连后端的内部地址（默认走 Docker 网络）
       INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://api:5000/api}
+    volumes:
+      - uploads_data:/app/public/uploads  # 持久化上传文件
     depends_on:
       - api
 
   # ===== 后台管理 =====
+  # 构建时不依赖任何环境变量；运行时由 entrypoint.sh 基于环境变量生成 config.js。
   admin:
     build:
       context: ./admin
       dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
-        VITE_SITE_NAME: ${SITE_NAME:-个人博客}后台管理
-        VITE_SITE_URL: ${SITE_URL:-http://localhost:3000}
     container_name: mblog-admin
     image: docker.cnb.cool/vxera/m-blog/admin:latest
     restart: unless-stopped
     ports:
       - "5173:80"
-    environment:
-      VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:5000/api}
-      VITE_SITE_NAME: ${SITE_NAME:-个人博客}后台管理
-      VITE_SITE_URL: ${SITE_URL:-http://localhost:3000}
+    env_file:
+      - .env   # 加载 SITE_URL / API_BASE_URL / SITE_NAME，entrypoint.sh 会注入到 config.js
 
   # ===== Nginx 反向代理 =====
   nginx:
@@ -114,20 +108,5 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${VOLUMES_DIR:-./data}/postgres
   uploads_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${VOLUMES_DIR:-./data}/uploads
   logs_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${VOLUMES_DIR:-./data}/logs

@@ -8,6 +8,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import PwaRegistration from "@/components/PwaRegistration";
 import IpBanOverlay from "@/components/IpBanOverlay";
 import { fetchSiteSettings } from "@/lib/api";
+import { getServerSiteUrl } from "@/lib/runtimeConfig";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,7 +21,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+/** 站点 URL（运行时从 .env / docker-compose 注入） */
+const siteUrl = getServerSiteUrl();
 
 const fallbackName = "个人博客";
 const fallbackDesc = "一个现代个人博客，分享技术实践、产品思考与项目复盘";
@@ -88,6 +90,17 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        {/* 运行时配置：将服务端环境变量注入到 window.__APP_CONFIG__ 供客户端读取 */}
+        <script
+          // 由 .env / docker-compose 在容器启动时注入；构建时为空字符串
+          dangerouslySetInnerHTML={{
+            __html: `window.__APP_CONFIG__ = ${JSON.stringify({
+              SITE_URL: process.env.SITE_URL || '',
+              API_BASE_URL: process.env.API_BASE_URL || '',
+              SITE_NAME: process.env.SITE_NAME || '',
+            })};`,
+          }}
+        />
         {/* 9.3 JSON-LD 结构化数据 — Website */}
         <script
           type="application/ld+json"

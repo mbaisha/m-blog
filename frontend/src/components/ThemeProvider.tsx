@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { PublicThemeSetting } from '@/types'
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig'
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -46,7 +47,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setTheme] = useState<PublicThemeSetting | null>(null)
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'
+    const baseUrl = getClientApiBaseUrl()
     fetch(`${baseUrl}/theme`)
       .then(res => res.json())
       .then((data: { success: boolean; data: PublicThemeSetting }) => {

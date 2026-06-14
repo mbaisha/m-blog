@@ -5,8 +5,9 @@ import { useAuthStore } from '@/stores/auth'
 import type { LoginRequest } from '@/types/api'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
-const siteName = import.meta.env.VITE_SITE_NAME || '后台管理'
+const siteName = runtimeConfig.SITE_NAME
 const router = useRouter()
 const authStore = useAuthStore()
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig'
 
 export default function SubscribeForm() {
   const [email, setEmail] = useState('')
@@ -15,7 +16,7 @@ export default function SubscribeForm() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api'}/subscribe`,
+        `${getClientApiBaseUrl()}/subscribe`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

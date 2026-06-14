@@ -1,13 +1,12 @@
 import type { ApiResponse, CaptchaImageResponse, CommentItem, CreateCommentRequest, CreateCommentResult, PagedData, PublicProfileSection, PublicProjectListItem, PublicProjectDetail, PublicFriendItem, PublicSiteSettingResponse, PublicSeoSettingResponse } from "@/types";
+import { getServerApiBaseUrl, getClientApiBaseUrl, getServerSiteUrl, getServerSiteName } from "./runtimeConfig";
 
-// API 地址策略：
-//   Docker SSR → INTERNAL_API_BASE_URL=http://api:5000/api (直连后端)
-//   本地 SSR  → NEXT_PUBLIC_API_BASE_URL (需在 .env.local 中设置)
-//   浏览器端  → NEXT_PUBLIC_API_BASE_URL (Nginx 代理或直连)
+// API 地址策略（运行时从 .env / docker-compose 注入）：
+//   Docker SSR → INTERNAL_API_BASE_URL=http://api:5000/api (容器内直连后端)
+//   本地 SSR  → API_BASE_URL
+//   浏览器端  → 优先 window.__APP_CONFIG__.API_BASE_URL（由根 layout 注入）
 const isServer = typeof window === 'undefined'
-const API_BASE_URL = isServer
-  ? (process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api')
-  : (process.env.NEXT_PUBLIC_API_BASE_URL || '/api')
+const API_BASE_URL = isServer ? getServerApiBaseUrl() : getClientApiBaseUrl()
 
 /**
  * 统一 API 请求客户端
@@ -177,11 +176,11 @@ export function submitMessage(data: CreateMessageRequest) {
   return apiClient.post<ApiResponse<MessageItem>>('/messages', data)
 }
 
-/** 获取站点配置 */
+/** 获取站点配置（运行时从环境变量读取） */
 export function getSiteConfig(): { siteUrl: string; siteName: string; apiBaseUrl: string } {
   return {
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    siteName: process.env.NEXT_PUBLIC_SITE_NAME || '个人博客',
+    siteUrl: getServerSiteUrl(),
+    siteName: getServerSiteName(),
     apiBaseUrl: API_BASE_URL,
   }
 }

@@ -6,6 +6,7 @@ import type { ApiResponse, PublicCategoryInfo, PagedData, PublicArticleListItem,
 import { fetchPageLayout } from "@/lib/api";
 import VisitTracker from "@/components/VisitTracker"
 import ArticleListView from "@/components/ArticleListView"
+import { getServerSiteUrl } from "@/lib/runtimeConfig"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${cat.name} - 分类`,
         description: cat.description || `${cat.name}分类下的文章`,
         type: 'website',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/categories/${cat.slug}`,
+        url: `${getServerSiteUrl()}/categories/${cat.slug}`,
       },
       twitter: {
         card: 'summary_large_image',

@@ -4,13 +4,14 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { PageListItem } from '@/types/pages'
 import { getPageListApi, deletePageApi } from '@/api/page'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
 const router = useRouter()
 const loading = ref(false)
 const pages = ref<PageListItem[]>([])
 
-/** 前台站点 URL */
-const siteUrl = import.meta.env.VITE_SITE_URL || 'http://localhost:3000'
+/** 前台站点 URL（运行时从环境变量读取，部署时由 .env 注入） */
+const siteUrl = runtimeConfig.SITE_URL
 
 async function loadPages() {
   loading.value = true

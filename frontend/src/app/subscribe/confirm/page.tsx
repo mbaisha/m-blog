@@ -2,8 +2,9 @@
 
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api';
+const API_BASE_URL = getClientApiBaseUrl();
 
 type Status = 'loading' | 'success' | 'expired' | 'invalid' | 'error';
 

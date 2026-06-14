@@ -3,8 +3,9 @@
 import { Suspense, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5092/api';
+const API_BASE_URL = getClientApiBaseUrl();
 
 type Step = 'prefix' | 'verify' | 'done' | 'subscribe';
 

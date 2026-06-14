@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,8 +11,8 @@ const authStore = useAuthStore()
 /** 侧边栏是否折叠 */
 const isCollapsed = ref(false)
 
-/** 站点名称 */
-const siteName = import.meta.env.VITE_SITE_NAME || '后台管理'
+/** 站点名称（运行时从环境变量读取，部署时由 .env 注入） */
+const siteName = runtimeConfig.SITE_NAME
 const user = computed(() => authStore.user)
 
 /** 菜单分组定义 */

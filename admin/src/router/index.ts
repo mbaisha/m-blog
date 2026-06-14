@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import { runtimeConfig } from '@/utils/runtimeConfig'
 
 /** 路由配置 */
 const routes: RouteRecordRaw[] = [
@@ -237,7 +238,7 @@ const router = createRouter({
 /** 路由守卫：未登录重定向到登录页 */
 router.beforeEach((to, _from, next) => {
   // 更新页面标题
-  document.title = `${to.meta.title || '后台管理'} - ${import.meta.env.VITE_SITE_NAME || '个人博客'}`
+  document.title = `${to.meta.title || '后台管理'} - ${runtimeConfig.SITE_NAME}`
 
   // 登录页和无需认证页面直接放行
   if (to.meta.noAuth) {

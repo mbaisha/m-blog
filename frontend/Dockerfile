@@ -1,21 +1,19 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
-# 构建参数（运行时会被 inlined 到客户端 JS 中，必须在此设置）
-ARG NEXT_PUBLIC_API_BASE_URL
-ARG NEXT_PUBLIC_SITE_URL
-ARG NEXT_PUBLIC_SITE_NAME
-ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
-
 # 复制依赖文件
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # 复制源码并构建
+# 注意：客户端相关的环境变量（SITE_URL/API_BASE_URL/SITE_NAME）在运行时由 docker-compose 注入，
+# 构建时统一置空，避免构建产物与运行环境耦合。
+# INTERNAL_API_BASE_URL 传给 next.config.ts（构建时）用于服务端 rewrites 目标。
+ARG INTERNAL_API_BASE_URL=http://api:5000/api
+ENV INTERNAL_API_BASE_URL=$INTERNAL_API_BASE_URL
 COPY . .
-RUN npm run build
+RUN NEXT_PUBLIC_SITE_URL="" NEXT_PUBLIC_API_BASE_URL="" NEXT_PUBLIC_SITE_NAME="" \
+    npm run build
 
 # 运行镜像
 FROM node:22-alpine AS runtime

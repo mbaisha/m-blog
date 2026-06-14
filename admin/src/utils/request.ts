@@ -2,10 +2,11 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from '@/types/api'
 import { useAuthStore } from '@/stores/auth'
+import { runtimeConfig } from './runtimeConfig'
 
 /** 创建 Axios 实例 */
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: runtimeConfig.API_BASE_URL,
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' }
 })
@@ -36,7 +37,7 @@ async function refreshAccessToken(): Promise<string> {
   if (!refreshToken) throw new Error('No refresh token')
 
   const res = await axios.post<ApiResponse<{ accessToken: string; refreshToken: string }>>(
-    `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+    `${runtimeConfig.API_BASE_URL}/auth/refresh`,
     { refreshToken }
   )
 
@@ -82,7 +83,7 @@ request.interceptors.response.use(
           localStorage.removeItem('refreshToken')
           const authStore = useAuthStore()
           authStore.clearUser()
-          window.location.href = import.meta.env.BASE_URL + 'login'
+          window.location.href = (import.meta.env.BASE_URL || '/') + 'login'
           return Promise.reject(error)
         }
       } else {

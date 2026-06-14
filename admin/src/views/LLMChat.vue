@@ -68,7 +68,7 @@ async function sendStream(text: string, assistantIndex: number) {
   const controller = new AbortController()
   streamAbort.value = controller
 
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/llm/chat`, {
+  const response = await fetch(`${runtimeConfig.API_BASE_URL}/admin/llm/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
