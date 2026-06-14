@@ -6,6 +6,7 @@ import { apiClient, fetchPageLayout } from "@/lib/api"
 import type { ApiResponse, PublicProjectDetail, PublicModuleLayout } from "@/types"
 import VisitTracker from "@/components/VisitTracker"
 import MarkdownContent from "../../articles/[slug]/MarkdownContent"
+import { getServerSiteUrl } from "@/lib/runtimeConfig"
 
 interface Props {
   params: Promise<{ slug: string }>

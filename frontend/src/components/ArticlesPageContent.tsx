@@ -7,6 +7,7 @@ import Image from 'next/image'
 import type { PublicArticleListItem, PublicCategoryInfo, PublicTagInfo, PublicModuleLayout } from '@/types'
 import LayoutUniversalModules from '@/components/LayoutUniversalModules'
 import ArticleCard from '@/components/ArticleCard'
+import { getClientApiBaseUrl } from '@/lib/runtimeConfig'
 
 // ===== Types =====
 
