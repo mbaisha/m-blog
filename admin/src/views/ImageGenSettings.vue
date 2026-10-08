@@ -205,10 +205,12 @@ onMounted(load)
       </el-form-item>
 
       <el-form-item label="默认质量">
-        <el-select v-model="form.defaultQuality">
+        <el-select v-model="form.defaultQuality" placeholder="请选择">
+          <el-option label="不发送（兼容模式）" value="" />
           <el-option label="标准 (standard)" value="standard" />
           <el-option label="高清 (hd)" value="hd" />
         </el-select>
+        <div class="tip">选「不发送」可兼容不支持 quality 参数的供应商。</div>
       </el-form-item>
 
       <el-form-item label="默认数量">

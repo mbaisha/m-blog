@@ -210,15 +210,35 @@ public class ArticleAiService : IArticleAiService
 
     private async Task<ArticleCoverResult> DownloadAndSaveImage(string imageUrl, Guid userId)
     {
-        var client = _httpClientFactory.CreateClient();
-        var imageBytes = await client.GetByteArrayAsync(imageUrl);
+        // 兼容 data URI（base64）：供应商可能直接返回 base64 而非 URL
+        byte[] imageBytes;
+        string contentType;
+        if (imageUrl.StartsWith("data:", StringComparison.Ordinal))
+        {
+            var commaIdx = imageUrl.IndexOf(',');
+            if (commaIdx < 0) throw new InvalidOperationException("无效的 data URI");
+            var header = imageUrl.Substring(5, commaIdx - 5); // image/png;base64
+            contentType = header.Split(';')[0];
+            imageBytes = Convert.FromBase64String(imageUrl.Substring(commaIdx + 1));
+        }
+        else
+        {
+            var client = _httpClientFactory.CreateClient();
+            imageBytes = await client.GetByteArrayAsync(imageUrl);
+            contentType = "image/png";
+            // 尝试从 URL 推断
+            if (imageUrl.Contains(".jpg") || imageUrl.Contains(".jpeg")) contentType = "image/jpeg";
+            else if (imageUrl.Contains(".webp")) contentType = "image/webp";
+        }
 
-        // 推断扩展名
-        var ext = ".png";
-        var contentType = "image/png";
-        // 尝试从 URL 或响应头推断
-        if (imageUrl.Contains(".jpg") || imageUrl.Contains(".jpeg")) { ext = ".jpg"; contentType = "image/jpeg"; }
-        else if (imageUrl.Contains(".webp")) { ext = ".webp"; contentType = "image/webp"; }
+        // 由 MIME 推断扩展名
+        var ext = contentType switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/webp" => ".webp",
+            "image/gif" => ".gif",
+            _ => ".png"
+        };
 
         var safeFilename = $"{Guid.NewGuid()}{ext}";
         var dateDir = DateTime.UtcNow.ToString("yyyy/MM/dd");
