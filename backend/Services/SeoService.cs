@@ -158,8 +158,8 @@ public class SeoService : ISeoService
     public async Task<string> GetRobotsTxtAsync()
     {
         // 站点 URL 从环境变量读取（部署时在 docker-compose.yml / .env 中配置）
-        var baseUrl = (Environment.GetEnvironmentVariable("PUBLIC_SITE_URL")
-                    ?? Environment.GetEnvironmentVariable("SITE_URL")
+        var baseUrl = ( Environment.GetEnvironmentVariable("SITE_URL") 
+                    ?? Environment.GetEnvironmentVariable("PUBLIC_SITE_URL")
                     ?? "").TrimEnd('/');
 
         return $@"User-agent: *

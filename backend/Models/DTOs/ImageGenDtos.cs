@@ -10,8 +10,10 @@ public class SaveImageGenConfigRequest
     public string Model { get; set; } = string.Empty;
     public string AvailableModels { get; set; } = "[]";
     public string DefaultSize { get; set; } = "1024x1024";
+    public string AvailableSizes { get; set; } = "[]";
     public string DefaultQuality { get; set; } = "standard";
     public int DefaultN { get; set; } = 1;
+    public int TimeoutSeconds { get; set; } = 300;
 }
 
 /// <summary>

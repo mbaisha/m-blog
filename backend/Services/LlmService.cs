@@ -70,6 +70,7 @@ public class LlmService : ILlmService
         config.Temperature = request.Temperature;
         config.MemoryEnabled = request.MemoryEnabled;
         config.MaxMemoryRounds = request.MaxMemoryRounds;
+        config.TimeoutSeconds = request.TimeoutSeconds;
 
         await _db.SaveChangesAsync();
         return config;
@@ -85,7 +86,9 @@ public class LlmService : ILlmService
         var apiUrl = GetApiUrl(config);
         var requestBody = BuildRequestBody(config, messages, stream: false);
 
-        var client = _httpClientFactory.CreateClient();client.Timeout = TimeSpan.FromMinutes(5); // 设置更长的超时时间以适应慢响应
+        var client = _httpClientFactory.CreateClient();
+        if (config.TimeoutSeconds > 0)
+            client.Timeout = TimeSpan.FromSeconds(config.TimeoutSeconds);
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, apiUrl)
         {
             Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
@@ -129,6 +132,8 @@ public class LlmService : ILlmService
         var requestBody = BuildRequestBody(config, messages, stream: true);
 
         var client = _httpClientFactory.CreateClient();
+        if (config.TimeoutSeconds > 0)
+            client.Timeout = TimeSpan.FromSeconds(config.TimeoutSeconds);
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, apiUrl)
         {
             Content = new StringContent(requestBody, Encoding.UTF8, "application/json")

@@ -12,6 +12,7 @@ export interface LlmConfig {
   temperature: number
   memoryEnabled: boolean
   maxMemoryRounds: number
+  timeoutSeconds: number
 }
 
 export interface SaveLlmConfigRequest {
@@ -25,6 +26,7 @@ export interface SaveLlmConfigRequest {
   temperature: number
   memoryEnabled: boolean
   maxMemoryRounds: number
+  timeoutSeconds: number
 }
 
 export interface LlmChatRequest {

@@ -16,7 +16,8 @@ const form = ref<LlmConfig>({
   maxTokens: 4096,
   temperature: 0.7,
   memoryEnabled: false,
-  maxMemoryRounds: 10
+  maxMemoryRounds: 10,
+  timeoutSeconds: 300
 })
 
 const availableModelsStr = ref('')
@@ -37,7 +38,8 @@ async function load() {
         maxTokens: d.maxTokens ?? 4096,
         temperature: d.temperature ?? 0.7,
         memoryEnabled: d.memoryEnabled ?? false,
-        maxMemoryRounds: d.maxMemoryRounds ?? 10
+        maxMemoryRounds: d.maxMemoryRounds ?? 10,
+        timeoutSeconds: d.timeoutSeconds ?? 300
       }
       try {
         const arr = JSON.parse(d.availableModels || '[]')
@@ -116,6 +118,12 @@ onMounted(load)
         <el-slider v-model="form.temperature" :min="0" :max="2" :step="0.1" show-input />
       </el-form-item>
 
+      <el-form-item label="请求超时">
+        <el-input-number v-model="form.timeoutSeconds" :min="0" :max="3600" :step="10" controls-position="right" />
+        <span class="unit">秒</span>
+        <div class="tip">请求大模型 API 的超时时间，0 表示不限制（默认 300 秒）。</div>
+      </el-form-item>
+
       <el-divider content-position="left">记忆设置</el-divider>
 
       <el-form-item label="启用记忆">
@@ -142,4 +150,5 @@ h2 { margin: 0 0 8px 0; font-size: 20px; }
 .settings-form { max-width: 600px; }
 .tip { color: #909399; font-size: 12px; margin-top: 4px; }
 .ml-2 { margin-left: 8px; color: #666; font-size: 13px; }
+.unit { margin-left: 8px; color: #666; }
 </style>

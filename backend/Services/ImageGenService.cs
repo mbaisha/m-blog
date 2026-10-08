@@ -57,8 +57,10 @@ public class ImageGenService : IImageGenService
         config.Model = request.Model;
         config.AvailableModels = request.AvailableModels;
         config.DefaultSize = request.DefaultSize;
+        config.AvailableSizes = request.AvailableSizes;
         config.DefaultQuality = request.DefaultQuality;
         config.DefaultN = request.DefaultN;
+        config.TimeoutSeconds = request.TimeoutSeconds;
 
         await _db.SaveChangesAsync();
         return config;
@@ -82,6 +84,8 @@ public class ImageGenService : IImageGenService
         };
 
         var client = _httpClientFactory.CreateClient();
+        if (config.TimeoutSeconds > 0)
+            client.Timeout = TimeSpan.FromSeconds(config.TimeoutSeconds);
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, apiUrl)
         {
             Content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json")

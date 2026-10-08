@@ -7,8 +7,10 @@ export interface ImageGenConfig {
   model: string
   availableModels: string
   defaultSize: string
+  availableSizes: string
   defaultQuality: string
   defaultN: number
+  timeoutSeconds: number
 }
 
 export interface SaveImageGenConfigRequest {
@@ -17,8 +19,10 @@ export interface SaveImageGenConfigRequest {
   model: string
   availableModels: string
   defaultSize: string
+  availableSizes: string
   defaultQuality: string
   defaultN: number
+  timeoutSeconds: number
 }
 
 export interface ImageGenRequest {

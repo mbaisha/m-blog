@@ -31,8 +31,10 @@ public class ImageGenController : ControllerBase
             config.Model,
             config.AvailableModels,
             config.DefaultSize,
+            config.AvailableSizes,
             config.DefaultQuality,
-            config.DefaultN
+            config.DefaultN,
+            config.TimeoutSeconds
         }));
     }
 

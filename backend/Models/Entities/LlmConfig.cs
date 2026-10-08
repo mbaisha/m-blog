@@ -34,4 +34,7 @@ public class LlmConfig : BaseEntity
 
     /// <summary>记忆保留轮数（MaxMemoryRounds * 2 = 消息条数）</summary>
     public int MaxMemoryRounds { get; set; } = 10;
+
+    /// <summary>请求大模型 API 的超时时间（秒），&lt;=0 表示不限制</summary>
+    public int TimeoutSeconds { get; set; } = 300;
 }

@@ -35,7 +35,8 @@ public class LlmController : ControllerBase
             config.MaxTokens,
             config.Temperature,
             config.MemoryEnabled,
-            config.MaxMemoryRounds
+            config.MaxMemoryRounds,
+            config.TimeoutSeconds
         }));
     }
 

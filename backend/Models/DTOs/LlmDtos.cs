@@ -15,6 +15,7 @@ public class SaveLlmConfigRequest
     public double Temperature { get; set; } = 0.7;
     public bool MemoryEnabled { get; set; } = false;
     public int MaxMemoryRounds { get; set; } = 10;
+    public int TimeoutSeconds { get; set; } = 300;
 }
 
 /// <summary>
